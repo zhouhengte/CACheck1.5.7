@@ -355,7 +355,7 @@
     __weak typeof(self) weakSelf = self;
     //半透明背景
     self.grayTranslucentView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight)];
-    _grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0.5];
+    _grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
     [self.view addSubview:_grayTranslucentView];
     
     //给半透明背景添加点击事件
@@ -402,24 +402,29 @@
                     make.left.mas_equalTo(self.view);
                     make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
                 }];
-
+                self.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0.7];
+                [self.grayTranslucentView setNeedsLayout];
+                [self.grayTranslucentView layoutIfNeeded];
                 [self.isSettedBottomView setNeedsLayout];
                 [self.isSettedBottomView layoutIfNeeded];
             }];
             
 
             self.isSettedDueDateView.closeBlock = ^(){
-                [weakSelf.grayTranslucentView removeFromSuperview];
+                
                 [UIView animateWithDuration:0.25 animations:^{
                     [weakSelf.isSettedBottomView mas_remakeConstraints:^(MASConstraintMaker *make) {
                         make.top.mas_equalTo(kScreenHeight);
                         make.left.mas_equalTo(weakSelf.view);
                         make.size.mas_equalTo(CGSizeMake(kScreenWidth, 311/586.0*kScreenHeight));
                     }];
+                    weakSelf.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
+                    [weakSelf.grayTranslucentView layoutIfNeeded];
                     [weakSelf.isSettedBottomView setNeedsLayout];
                     [weakSelf.isSettedBottomView layoutIfNeeded];
                 } completion:^(BOOL finished) {
                     [weakSelf.isSettedBottomView removeFromSuperview];
+                    [weakSelf.grayTranslucentView removeFromSuperview];
                 }];
             };
             
@@ -457,18 +462,20 @@
                 }];
                 
                 weakSelf.duedateView.cancelBlock = ^(){
-                    [weakSelf.grayTranslucentView removeFromSuperview];
                     [UIView animateWithDuration:0.25 animations:^{
                         [weakSelf.bottomView mas_remakeConstraints:^(MASConstraintMaker *make) {
                             make.top.mas_equalTo(kScreenHeight);
                             make.left.mas_equalTo(weakSelf.view);
                             make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
                         }];
+                        weakSelf.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
+                        [weakSelf.grayTranslucentView layoutIfNeeded];
                         [weakSelf.bottomView setNeedsLayout];
                         [weakSelf.bottomView layoutIfNeeded];
                     }completion:^(BOOL finished) {
                         //完成后将容器移除
                         [weakSelf.bottomView removeFromSuperview];
+                        [weakSelf.grayTranslucentView removeFromSuperview];
                     }];
                 };
                 
@@ -538,23 +545,29 @@
             make.left.mas_equalTo(self.view);
             make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
         }];
+        self.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0.7];
+        [self.grayTranslucentView setNeedsLayout];
+        [self.grayTranslucentView layoutIfNeeded];
         [_bottomView setNeedsLayout];
         [_bottomView layoutIfNeeded];
     }];
     //设置取消按钮的block
     _duedateView.cancelBlock = ^(){
-        [weakSelf.grayTranslucentView removeFromSuperview];
+        
         [UIView animateWithDuration:0.25 animations:^{
             [weakSelf.bottomView mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.top.mas_equalTo(kScreenHeight);
                 make.left.mas_equalTo(weakSelf.view);
                 make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
             }];
+            weakSelf.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
+            [weakSelf.grayTranslucentView setNeedsLayout];
             [weakSelf.bottomView setNeedsLayout];
             [weakSelf.bottomView layoutIfNeeded];
         }completion:^(BOOL finished) {
             //完成后将容器移除
             [weakSelf.bottomView removeFromSuperview];
+            [weakSelf.grayTranslucentView removeFromSuperview];
         }];
     };
     
@@ -580,17 +593,19 @@
         
         //设置已完成界面的关闭按钮block
         weakSelf.isSettedDueDateView.closeBlock = ^(){
-            [weakSelf.grayTranslucentView removeFromSuperview];
             [UIView animateWithDuration:0.25 animations:^{
                 [weakSelf.isSettedBottomView mas_remakeConstraints:^(MASConstraintMaker *make) {
                     make.top.mas_equalTo(kScreenHeight);
                     make.left.mas_equalTo(weakSelf.view);
                     make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
                 }];
+                weakSelf.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
+                [weakSelf.grayTranslucentView setNeedsLayout];
                 [weakSelf.isSettedBottomView setNeedsLayout];
                 [weakSelf.isSettedBottomView layoutIfNeeded];
             }completion:^(BOOL finished) {
                 [weakSelf.isSettedBottomView removeFromSuperview];
+                [weakSelf.grayTranslucentView removeFromSuperview];
             }];
 
         };
@@ -771,7 +786,8 @@
                 make.size.mas_equalTo(CGSizeMake(kScreenWidth, 299/586.0*kScreenHeight));
             }];
         }
-
+        self.grayTranslucentView.backgroundColor = [UIColor colorWithWhite:0.2 alpha:0];
+        [self.grayTranslucentView setNeedsLayout];
         [self.bottomView setNeedsLayout];
         [self.bottomView layoutIfNeeded];
         [self.isSettedBottomView setNeedsLayout];

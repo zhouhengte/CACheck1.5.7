@@ -107,13 +107,13 @@
         make.center.mas_equalTo(0);
     }];
     UIView *leftLineView = [[UIView alloc]init];
-    leftLineView.backgroundColor = UIColorFromRGB(0xD3D3D3);
+    leftLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
     [lineView addSubview:leftLineView];
     [leftLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(0);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(huoLabel.mas_left).mas_equalTo(-25);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     UIView *rightLineView = [[UIView alloc]init];
     rightLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
@@ -122,7 +122,7 @@
         make.centerY.mas_equalTo(0);
         make.right.mas_equalTo(-23);
         make.left.mas_equalTo(huoLabel.mas_right).mas_equalTo(25);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     UIImageView *userNameImageView = [[UIImageView alloc]init];
@@ -134,16 +134,17 @@
         make.size.mas_equalTo(CGSizeMake(18, 19));
     }];
     self.userNameTextField = [[UITextField alloc]init];
-    _userNameTextField.keyboardType = UIKeyboardTypeASCIICapable;
+    //_userNameTextField.keyboardType = UIKeyboardTypeASCIICapable;
     [self.userNameTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
     _userNameTextField.font = [UIFont systemFontOfSize:14];
     _userNameTextField.placeholder = @"请输入账号或手机号";
+    [_userNameTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     [_loginView addSubview:_userNameTextField];
     [_userNameTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(userNameImageView.mas_right).mas_equalTo(14);
         make.right.mas_equalTo(-23);
         make.centerY.mas_equalTo(userNameImageView);
-        make.height.mas_equalTo(18);
+        make.height.mas_equalTo(38);
     }];
     UIView *userNameLineView = [[UIView alloc]init];
     userNameLineView.backgroundColor = UIColorFromRGB(0xbebebe);
@@ -152,7 +153,7 @@
         make.top.mas_equalTo(userNameImageView.mas_bottom).mas_equalTo(5);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     UIImageView *passwordImageView = [[UIImageView alloc]init];
@@ -168,12 +169,13 @@
     _passwordTextField.secureTextEntry = YES;
     _passwordTextField.font = [UIFont systemFontOfSize:14];
     _passwordTextField.placeholder = @"请输入密码";
+    [_passwordTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     [_loginView addSubview:_passwordTextField];
     [_passwordTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(passwordImageView.mas_right).mas_equalTo(14);
         make.right.mas_equalTo(-23);
         make.centerY.mas_equalTo(passwordImageView);
-        make.height.mas_equalTo(18);
+        make.height.mas_equalTo(38);
     }];
     UIView *passwordLineView = [[UIView alloc]init];
     passwordLineView.backgroundColor = UIColorFromRGB(0xbebebe);
@@ -182,14 +184,16 @@
         make.top.mas_equalTo(passwordImageView.mas_bottom).mas_equalTo(5);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     self.loginButton = [[UIButton alloc]init];
-    _loginButton.backgroundColor = UIColorFromRGB(0xbebebe);
-    [self.loginButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-    [self.loginButton.layer setCornerRadius:8.0]; //设置矩圆角半径
+    _loginButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
+    self.loginButton.userInteractionEnabled = NO;
+    [self.loginButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.loginButton.layer setCornerRadius:5.0]; //设置矩圆角半径
     [_loginButton setTitle:@"登录" forState:UIControlStateNormal];
+    _loginButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [_loginButton addTarget:self action:@selector(loginClick:) forControlEvents:UIControlEventTouchUpInside];
     [_loginView addSubview:_loginButton];
     [_loginButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -258,11 +262,11 @@
 {
     if ([sender.text isEqualToString:@""]) {
         self.loginButton.userInteractionEnabled = NO;
-        [self.loginButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        self.loginButton.backgroundColor = UIColorFromRGB(0xbebebe);
+        //[self.loginButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
+        self.loginButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
     }else{
         self.loginButton.userInteractionEnabled = YES;
-        [self.loginButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        //[self.loginButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.loginButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
     }
 }
@@ -341,7 +345,23 @@
     snsPlatform.loginClickHandler(self,[UMSocialControllerService defaultControllerService],YES,^(UMSocialResponseEntity *response){
         
         //          获取微博用户名、uid、token等
-        
+        //NSLog(@"sina response:%@",response);
+        if (response.responseCode == UMSResponseCodeGetProfileFailed) {
+            MBProgressHUD *Hud = [[MBProgressHUD alloc] initWithView:self.view];
+            [self.view addSubview:Hud];
+            Hud.labelText = @"获取微博账号失败";
+            Hud.labelFont = [UIFont systemFontOfSize:14];
+            Hud.mode = MBProgressHUDModeText;
+            //            hud.yOffset = 250;
+            [Hud showAnimated:YES whileExecutingBlock:^{
+                sleep(1.5);
+                
+            } completionBlock:^{
+                [Hud removeFromSuperview];
+                self.from = nil;
+            }];
+
+        }
         if (response.responseCode == UMSResponseCodeSuccess) {
             
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -374,7 +394,9 @@
                         thirdTelVerificationVC.thirdToken = snsAccount.accessToken;
                         thirdTelVerificationVC.openID = snsAccount.usid;
                         [self.navigationController pushViewController:thirdTelVerificationVC animated:YES];
-                    }else if ([responseObject[@"Result"]integerValue] == 1){
+                    }
+                }
+                else if ([responseObject[@"Result"]integerValue] == 1){
                         //其他错误情况
                         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                             _hud.mode = MBProgressHUDModeText;
@@ -385,7 +407,6 @@
                                 [_hud removeFromSuperview];
                             });
                         });
-                    }
                 }if ([responseObject[@"Result"]integerValue] == 0) {
                     //登陆成功
                     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -410,14 +431,13 @@
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                 NSLog(@"error:%@",error);
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    _hud.labelText = @"连接超时";
+                    _hud.labelText = @"网络错误";
                     _hud.labelFont = [UIFont systemFontOfSize:14];
                     _hud.mode = MBProgressHUDModeText;
                     [_hud showAnimated:YES whileExecutingBlock:^{
                         sleep(1.5);
                     } completionBlock:^{
                         [_hud removeFromSuperview];
-                        [self dismissViewControllerAnimated:YES completion:nil];
                     }];
                 });
             }];
@@ -464,18 +484,20 @@
                         thirdTelVerificationVC.thirdToken = snsAccount.accessToken;
                         thirdTelVerificationVC.openID = snsAccount.usid;
                         [self.navigationController pushViewController:thirdTelVerificationVC animated:YES];
-                    }else if ([responseObject[@"Result"]integerValue] == 1){
-                        //其他错误情况
-                        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-                            _hud.mode = MBProgressHUDModeText;
-                            _hud.labelText = @"登录失败";
-                            sleep(1.5);
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [_hud hide:YES];
-                                [_hud removeFromSuperview];
-                            });
-                        });
                     }
+                }else if ([responseObject[@"Result"]integerValue] == 1)
+                {
+                        //其他错误情况
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            _hud.labelText = @"网络错误";
+                            _hud.labelFont = [UIFont systemFontOfSize:14];
+                            _hud.mode = MBProgressHUDModeText;
+                            [_hud showAnimated:YES whileExecutingBlock:^{
+                                sleep(1.5);
+                            } completionBlock:^{
+                                [_hud removeFromSuperview];
+                            }];
+                        });
                 }if ([responseObject[@"Result"]integerValue] == 0) {
                     //登陆成功
                     //将数据存储到NSUserDefautls中，
@@ -500,14 +522,13 @@
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                 NSLog(@"error:%@",error);
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    _hud.labelText = @"连接超时";
+                    _hud.labelText = @"网络错误";
                     _hud.labelFont = [UIFont systemFontOfSize:14];
                     _hud.mode = MBProgressHUDModeText;
                     [_hud showAnimated:YES whileExecutingBlock:^{
                         sleep(1.5);
                     } completionBlock:^{
                         [_hud removeFromSuperview];
-                        [self dismissViewControllerAnimated:YES completion:nil];
                     }];
                 });
             }];

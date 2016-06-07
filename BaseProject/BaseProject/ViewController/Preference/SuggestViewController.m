@@ -33,9 +33,6 @@
     self.placeholderLabel.font = [UIFont systemFontOfSize:15];
     [self.textView addSubview:self.placeholderLabel];
     
-//    //自定义导航条
-//    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithTitle:@"提交" style:UIBarButtonItemStylePlain target:self action:@selector(rightItemAction)];
-//    self.navigationItem.rightBarButtonItem = rightItem;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -47,6 +44,12 @@
 {
     [super viewWillDisappear:animated];
     [MobClick endLogPageView:@"意见反馈"];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self.textView becomeFirstResponder];
 }
 
 

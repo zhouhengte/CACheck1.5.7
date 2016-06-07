@@ -32,4 +32,10 @@
     return nil;
 }
 
+//-(void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+//    if (navigationController.viewControllers) {
+//        <#statements#>
+//    }
+//}
+
 @end

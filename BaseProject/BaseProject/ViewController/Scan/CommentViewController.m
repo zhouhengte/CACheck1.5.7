@@ -101,6 +101,9 @@
             make.height.mas_equalTo(height + 61);
             make.bottom.mas_equalTo(-keyboardFrame.size.height);
         }];
+        _grayTranslucentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+        [_grayTranslucentView setNeedsLayout];
+        [_grayTranslucentView layoutIfNeeded];
         [self.editView layoutIfNeeded];
         
     } completion:nil];
@@ -109,7 +112,6 @@
 
 -(void)closeKeyboard:(NSNotification *)noti
 {
-    self.grayTranslucentView.hidden = YES;
     // 获取键盘动画的种类
     int options = [noti.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
     
@@ -124,8 +126,13 @@
             make.height.mas_equalTo(94);
             make.bottom.mas_equalTo(94);
         }];
+        _grayTranslucentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
+        [_grayTranslucentView setNeedsLayout];
         [self.view layoutIfNeeded];
-    } completion:nil];
+    } completion:^(BOOL finished) {
+        self.grayTranslucentView.hidden = YES;
+    }
+    ];
     
 }
 
@@ -328,7 +335,7 @@
     
     self.grayTranslucentView = [[UIView alloc]init];
     _grayTranslucentView.frame = self.view.frame;
-    _grayTranslucentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3];
+    _grayTranslucentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
     UITapGestureRecognizer *blockTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(blockClick:)];
     [_grayTranslucentView addGestureRecognizer:blockTap];
     [self.view addSubview:_grayTranslucentView];

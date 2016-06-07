@@ -42,9 +42,9 @@
 #endif
 
 static const CGFloat JSBadgeViewShadowRadius = 1.0f;
-static const CGFloat JSBadgeViewHeight = 11.0f;//改这个即可改变圆点大小,配合字体大小
+static const CGFloat JSBadgeViewHeight = 16.0f;//改这个即可改变圆点大小,配合字体大小
 static const CGFloat JSBadgeViewTextSideMargin = 4.0f;//改变圆点宽度
-static const CGFloat JSBadgeViewCornerRadius = 10.0f;
+static const CGFloat JSBadgeViewCornerRadius = 16.0f;
 
 // Thanks to Peter Steinberger: https://gist.github.com/steipete/6526860
 static BOOL JSBadgeViewIsUIKitFlatMode(void)

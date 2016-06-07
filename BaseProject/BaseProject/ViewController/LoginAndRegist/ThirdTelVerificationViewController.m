@@ -38,6 +38,7 @@
     }];
     self.phoneNumTextField = [[UITextField alloc]init];
     _phoneNumTextField.placeholder = @"请输入手机号";
+    [_phoneNumTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _phoneNumTextField.font = [UIFont systemFontOfSize:14];
     [self.phoneNumTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
     [self.view addSubview:_phoneNumTextField];
@@ -45,7 +46,7 @@
         make.centerY.mas_equalTo(phoneNumLabel);
         make.left.mas_equalTo(95);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(28);
+        make.height.mas_equalTo(38);
     }];
     UIView *firstLineView = [[UIView alloc]init];
     firstLineView.backgroundColor = UIColorFromRGB(0xbebebe);
@@ -54,7 +55,7 @@
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
         make.top.mas_equalTo(phoneNumLabel.mas_bottom).mas_equalTo(20);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     UILabel *verificationLabel = [[UILabel alloc]init];
     verificationLabel.text = @"验证码";
@@ -68,11 +69,13 @@
     [_verificationButton setTitle:@"点击获取" forState:UIControlStateNormal];
     [_verificationButton addTarget:self action:@selector(sendVerification:) forControlEvents:UIControlEventTouchUpInside];
     _verificationButton.titleLabel.font = [UIFont systemFontOfSize:14];
-    [_verificationButton setTitleColor:[UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1] forState:UIControlStateNormal];
+    self.verificationButton.userInteractionEnabled = NO;
+    [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+    self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     [_verificationButton.layer setMasksToBounds:YES];
     [_verificationButton.layer setCornerRadius:6.0]; //设置矩圆角半径
     [_verificationButton.layer setBorderWidth:1.0];   //边框宽度
-    [_verificationButton.layer setBorderColor:[UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1].CGColor];
+
     [self.view addSubview:_verificationButton];
     [_verificationButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(-23);
@@ -81,28 +84,33 @@
     }];
     self.verificationTextField = [[UITextField alloc]init];
     _verificationTextField.placeholder = @"请输入验证码";
+    [_verificationTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _verificationTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_verificationTextField];
     [_verificationTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(95);
         make.right.mas_equalTo(_verificationButton.mas_left).mas_equalTo(-10);
-        make.height.mas_equalTo(25);
+        make.height.mas_equalTo(38);
         make.centerY.mas_equalTo(verificationLabel);
     }];
     UIView *secondLineView = [[UIView alloc]init];
-    secondLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    secondLineView.backgroundColor = UIColorFromRGB(0xbebebe);
     [self.view addSubview:secondLineView];
     [secondLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(verificationLabel.mas_bottom).mas_equalTo(20);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     self.confirmButton = [[UIButton alloc]init];
     [_confirmButton addTarget:self action:@selector(confirmClick:) forControlEvents:UIControlEventTouchUpInside];
-    _confirmButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1];
+    _confirmButton.userInteractionEnabled = NO;
+    [_confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    _confirmButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
+
     [_confirmButton setTitle:@"确定" forState:UIControlStateNormal];
-    [_confirmButton.layer setCornerRadius:6.0]; //设置矩圆角半径
+    [_confirmButton.layer setCornerRadius:5.0]; //设置矩圆角半径
+    _confirmButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [self.view addSubview:_confirmButton];
     [_confirmButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(23);
@@ -118,15 +126,15 @@
     
     if (![self isMobileNumber:sender.text]) {
         _confirmButton.userInteractionEnabled = NO;
-        [_confirmButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        _confirmButton.backgroundColor = UIColorFromRGB(0xbebebe);
+        //[_confirmButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
+        _confirmButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
         
         self.verificationButton.userInteractionEnabled = NO;
-        [self.verificationButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        self.verificationButton.layer.borderColor = UIColorFromRGB(0x7e7e7e).CGColor;
+        [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+        self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     }else{
         _confirmButton.userInteractionEnabled = YES;
-        [_confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        //[_confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _confirmButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
         
         self.verificationButton.userInteractionEnabled = YES;
@@ -379,8 +387,8 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 //设置界面的按钮显示 根据自己需求设置
                 [self.verificationButton setTitle:[NSString stringWithFormat:@"重新获取(%@)",strTime] forState:UIControlStateNormal];
-                [self.verificationButton.layer setBorderColor:[UIColor grayColor].CGColor];
-                [self.verificationButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+                [self.verificationButton.layer setBorderColor:UIColorFromRGB(0xb4b4b4).CGColor];
+                [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
                 self.verificationButton.userInteractionEnabled = NO;
             });
             timeout--;

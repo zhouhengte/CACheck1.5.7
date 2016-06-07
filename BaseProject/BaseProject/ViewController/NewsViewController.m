@@ -9,6 +9,7 @@
 #import "NewsViewController.h"
 #import "NewsDetailViewController.h"
 #import <UMSocial.h>
+#import "MainViewController.h"
 //#import "MobClick.h"
 
 @interface NewsViewController ()<UIWebViewDelegate,UMSocialUIDelegate>
@@ -102,6 +103,7 @@
 
     
     [manager POST:url parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        //NSLog(@"%@",responseObject);
         self.url = responseObject[@"news_tips_link"];
         NSString  *str = [NSString stringWithFormat:@"%@/%@",kUrl,self.url];
         NSURL *url = [NSURL URLWithString:str];
@@ -244,7 +246,15 @@
         [self.webView goBack];
         
     } else {
-        [self.navigationController popViewControllerAnimated:YES];
+        //[self.navigationController popViewControllerAnimated:YES];
+        sender.alpha = 1.0;
+        CATransition* transition = [CATransition animation];
+        transition.type = kCATransitionMoveIn;//可更改为其他方式
+        transition.subtype = kCATransitionFromLeft;//可更改为其他方式
+        [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
+        MainViewController *mainVC = [self.storyboard instantiateViewControllerWithIdentifier:@"mainViewController"];
+        mainVC.newsViewController = self;
+        [self.navigationController pushViewController:mainVC animated:NO];
     }
 }
 

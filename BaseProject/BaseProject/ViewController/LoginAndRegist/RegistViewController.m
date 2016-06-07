@@ -41,15 +41,15 @@
     
     if (![self isMobileNumber:sender.text]) {
         self.registButton.userInteractionEnabled = NO;
-        [self.registButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        self.registButton.backgroundColor = UIColorFromRGB(0xbebebe);
+        //[self.registButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
+        self.registButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
         
         self.verificationButton.userInteractionEnabled = NO;
-        [self.verificationButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        self.verificationButton.layer.borderColor = UIColorFromRGB(0x7e7e7e).CGColor;
+        [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+        self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     }else{
         self.registButton.userInteractionEnabled = YES;
-        [self.registButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        //[self.registButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.registButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
         
         self.verificationButton.userInteractionEnabled = YES;
@@ -155,23 +155,24 @@
     }];
     self.phoneNumTextField = [[UITextField alloc]init];
     _phoneNumTextField.placeholder = @"请输入手机号";
+    [_phoneNumTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _phoneNumTextField.font = [UIFont systemFontOfSize:14];
     [self.phoneNumTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
     [self.view addSubview:_phoneNumTextField];
     [_phoneNumTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(95);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(25);
+        make.height.mas_equalTo(38);
         make.centerY.mas_equalTo(phoneNumLabel);
     }];
     UIView *firstLineView = [[UIView alloc]init];
-    firstLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    firstLineView.backgroundColor = UIColorFromRGB(0xbebebe);
     [self.view addSubview:firstLineView];
     [firstLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(phoneNumLabel.mas_bottom).mas_equalTo(20);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     UILabel *verificationLabel = [[UILabel alloc]init];
@@ -186,8 +187,8 @@
     [_verificationButton addTarget:self action:@selector(sendVerification:) forControlEvents:UIControlEventTouchUpInside];
     _verificationButton.titleLabel.font = [UIFont systemFontOfSize:14];
     self.verificationButton.userInteractionEnabled = NO;
-    [self.verificationButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-    self.verificationButton.layer.borderColor = UIColorFromRGB(0x7e7e7e).CGColor;
+    [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+    self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     [_verificationButton.layer setMasksToBounds:YES];
     [_verificationButton.layer setCornerRadius:6.0]; //设置矩圆角半径
     [_verificationButton.layer setBorderWidth:1.0];   //边框宽度
@@ -200,22 +201,23 @@
     }];
     self.verificationTextField = [[UITextField alloc]init];
     _verificationTextField.placeholder = @"请输入验证码";
+    [_verificationTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _verificationTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_verificationTextField];
     [_verificationTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(95);
         make.right.mas_equalTo(_verificationButton.mas_left).mas_equalTo(-10);
-        make.height.mas_equalTo(25);
+        make.height.mas_equalTo(38);
         make.centerY.mas_equalTo(verificationLabel);
     }];
     UIView *secondLineView = [[UIView alloc]init];
-    secondLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    secondLineView.backgroundColor = UIColorFromRGB(0xbebebe);
     [self.view addSubview:secondLineView];
     [secondLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(verificationLabel.mas_bottom).mas_equalTo(20);
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     UILabel *passwordLabel = [[UILabel alloc]init];
@@ -227,32 +229,34 @@
     }];
     self.passwordTextField = [[UITextField alloc]init];
     _passwordTextField.placeholder = @"请输入6位以上密码";
+    [_passwordTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _passwordTextField.secureTextEntry = YES;
     _passwordTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_passwordTextField];
     [_passwordTextField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(passwordLabel);
         make.left.mas_equalTo(95);
-        make.height.mas_equalTo(25);
+        make.height.mas_equalTo(38);
         make.right.mas_equalTo(-23);
     }];
     UIView *thirdLineView = [[UIView alloc]init];
-    thirdLineView.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    thirdLineView.backgroundColor = UIColorFromRGB(0xbebebe);
     [self.view addSubview:thirdLineView];
     [thirdLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(23);
         make.right.mas_equalTo(-23);
         make.top.mas_equalTo(passwordLabel.mas_bottom).mas_equalTo(20);
-        make.height.mas_equalTo(1);
+        make.height.mas_equalTo(0.5);
     }];
     
     self.registButton = [[UIButton alloc]init];
     [_registButton addTarget:self action:@selector(registClick:) forControlEvents:UIControlEventTouchUpInside];
     self.registButton.userInteractionEnabled = NO;
-    [self.registButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-    self.registButton.backgroundColor = UIColorFromRGB(0xbebebe);
+    [self.registButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.registButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
     [_registButton setTitle:@"确定" forState:UIControlStateNormal];
-    [_registButton.layer setCornerRadius:6.0]; //设置矩圆角半径
+    [_registButton.layer setCornerRadius:5.0]; //设置矩圆角半径
+    _registButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [self.view addSubview:_registButton];
     [_registButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(23);
@@ -334,8 +338,8 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 //设置界面的按钮显示 根据自己需求设置
                 [self.verificationButton setTitle:[NSString stringWithFormat:@"重新获取(%@)",strTime] forState:UIControlStateNormal];
-                [self.verificationButton.layer setBorderColor:[UIColor grayColor].CGColor];
-                [self.verificationButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+                [self.verificationButton.layer setBorderColor:UIColorFromRGB(0xb4b4b4).CGColor];
+                [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
                 self.verificationButton.userInteractionEnabled = NO;
             });
             timeout--;

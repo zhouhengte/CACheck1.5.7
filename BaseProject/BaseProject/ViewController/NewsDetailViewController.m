@@ -130,7 +130,7 @@
 {
     self.grayBackground = [[UIView alloc]init];
 //    _grayBackground.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-290);
-    _grayBackground.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+    _grayBackground.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
     [self.view addSubview:_grayBackground];
     [_grayBackground mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.top.right.bottom.mas_equalTo(0);
@@ -342,6 +342,7 @@
         [self.grayBackground mas_updateConstraints:^(MASConstraintMaker *make) {
             make.bottom.mas_equalTo(-290);
         }];
+        _grayBackground.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
         [self.grayBackground setNeedsLayout];
         [self.grayBackground layoutIfNeeded];
         [self.shareView setNeedsLayout];
@@ -443,7 +444,7 @@
 
 -(void)grayBackgroundTap:(UITapGestureRecognizer *)tap
 {
-    self.grayBackground.hidden = YES;
+    
     [UIView animateWithDuration:0.25 animations:^{
         [self.shareView mas_updateConstraints:^(MASConstraintMaker *make) {
             make.bottom.mas_equalTo(290);
@@ -451,10 +452,12 @@
         [self.grayBackground mas_updateConstraints:^(MASConstraintMaker *make) {
             make.bottom.mas_equalTo(0);
         }];
+        _grayBackground.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
+        [_grayBackground layoutIfNeeded];
         [self.shareView setNeedsLayout];
         [self.shareView layoutIfNeeded];
     } completion:^(BOOL finished) {
-        
+        self.grayBackground.hidden = YES;
     }];
 }
 

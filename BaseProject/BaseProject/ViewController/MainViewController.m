@@ -29,6 +29,8 @@
 @property (strong, nonatomic) JSBadgeView *messageBadgeView;
 @property (strong, nonatomic) JSBadgeView *newsBadgeView;
 
+@property (nonatomic , strong) NSMutableArray *messageArray;
+
 @property (nonatomic ,strong)NSUserDefaults *userDefaults;
 
 @property (assign, nonatomic)NSUInteger unReadNewsNum;
@@ -110,11 +112,14 @@
             make.size.mas_equalTo(self.scanRecordButton);
         }];
         
-        self.messageBadgeView = [[JSBadgeView alloc]initWithParentView:_messageButton alignment:JSBadgeViewAlignmentTopRight];
-        self.messageBadgeView.badgeBackgroundColor = [UIColor clearColor];
-        self.messageBadgeView.badgePositionAdjustment = CGPointMake(-15, 15);
-        //self.messageBadgeView.badgeStrokeWidth = 2;
+//        self.messageBadgeView = [[JSBadgeView alloc]initWithParentView:_messageButton alignment:JSBadgeViewAlignmentTopRight];
+//        self.messageBadgeView.badgeBackgroundColor = [UIColor clearColor];
+//        self.messageBadgeView.badgePositionAdjustment = CGPointMake(-15, 15);
         
+        self.messageBadgeView = [[JSBadgeView alloc]initWithParentView:_messageButton alignment:JSBadgeViewAlignmentTopRight];
+        self.messageBadgeView.badgePositionAdjustment = CGPointMake(-10, 15);
+        self.messageBadgeView.badgeTextFont = [UIFont systemFontOfSize:14];
+        self.messageBadgeView.badgeStrokeWidth = 5.0;
     }
     return _messageButton;
 }
@@ -133,9 +138,9 @@
             make.size.mas_equalTo(self.scanRecordButton);
         }];
         self.newsBadgeView = [[JSBadgeView alloc]initWithParentView:_newsButton alignment:JSBadgeViewAlignmentTopRight];
-        self.newsBadgeView.badgePositionAdjustment = CGPointMake(-15, 15);
-        _newsBadgeView.badgeTextFont = [UIFont systemFontOfSize:12];
-        _newsBadgeView.badgeStrokeWidth = 4.0;
+        self.newsBadgeView.badgePositionAdjustment = CGPointMake(-10, 15);
+        _newsBadgeView.badgeTextFont = [UIFont systemFontOfSize:14];
+        _newsBadgeView.badgeStrokeWidth = 2.0;
     }
     return _newsButton;
 }
@@ -301,8 +306,8 @@
     NSString *readNewsDateStr = [dateFormatter stringFromDate:readNewsDate];
 
     if (readNewsDateStr) {
-        //NSDictionary *dic = @{@"lasttime":readNewsDateStr};
-        NSDictionary *dic = @{@"lasttime":@"2016-05-01 12:00"};
+        NSDictionary *dic = @{@"lasttime":readNewsDateStr};
+        //NSDictionary *dic = @{@"lasttime":@"2016-06-01 12:00"};//获取截止固定日期的未读新闻数
         NSLog(@"paramDic:%@",dic);
         [manager POST:url parameters:dic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
             NSLog(@"responseObject:%@",responseObject);
@@ -319,6 +324,49 @@
     
 }
 
+-(void)getUnreadMessageNum
+{
+    //找到documents文件所在的路径
+    NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    //获取第一个文件夹的路径
+    NSString *filePath = [path objectAtIndex:0];
+    //把testPlist文件加入
+    NSString *plistPath = [filePath stringByAppendingPathComponent:@"duedate.plist"];
+    self.messageArray = [NSMutableArray arrayWithCapacity:1];
+    
+    NSArray * arrayFromfile = [NSArray arrayWithContentsOfFile:plistPath];
+    //            [array setArray:arrayFromfile];
+    [self.messageArray addObjectsFromArray:arrayFromfile];
+    NSMutableArray *mutableArray = [NSMutableArray arrayWithArray:self.messageArray];
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDate *readMessageDate = [userDefaults objectForKey:@"readMessageDate"];
+    NSDate *now = [NSDate date];
+    if (readMessageDate) {
+        for (NSDictionary *innerDic in mutableArray) {
+            NSDate *firedate = innerDic[@"firedate"];
+            //如果还没到该消息发送的时间，则不计算该消息
+            if ([firedate isEqualToDate:[firedate laterDate:now]]) {
+                [self.messageArray removeObject:innerDic];
+            }
+            if ([firedate isEqualToDate:[firedate earlierDate:readMessageDate]]) {
+                [self.messageArray removeObject:innerDic];
+            }
+        }
+        if (self.messageArray.count != 0) {
+            self.messageBadgeView.badgeText = [NSString stringWithFormat:@"%lu",(unsigned long)self.messageArray.count] ;
+            //self.messageBadgeView.badgeText = @"33";
+        }else{
+            self.messageBadgeView.badgeText = @"";
+        }
+        
+    }
+    
+    
+
+
+}
+
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -327,28 +375,24 @@
     [self.navigationController setNavigationBarHidden:YES];
     
     
-    NSInteger badge = [UIApplication sharedApplication].applicationIconBadgeNumber;
-    if (badge > 0) {
-        self.messageBadgeView.badgeText = @" ";
-        UIImage *redPoint = [UIImage imageNamed:@"椭圆 2"];
-        UIImageView *redPointImageView = [[UIImageView alloc]initWithImage:redPoint];
-        [self.messageBadgeView addSubview:redPointImageView];
-        redPointImageView.frame = CGRectMake(11, -7, 12, 12);
-        
-    }else{
-        self.messageBadgeView.badgeText = @"";
-        self.messageBadgeView.hidden = YES;
-    }
+//    NSInteger badge = [UIApplication sharedApplication].applicationIconBadgeNumber;
+//    if (badge > 0) {
+//        self.messageBadgeView.badgeText = @" ";
+//        UIImage *redPoint = [UIImage imageNamed:@"椭圆 2"];
+//        UIImageView *redPointImageView = [[UIImageView alloc]initWithImage:redPoint];
+//        [self.messageBadgeView addSubview:redPointImageView];
+//        redPointImageView.frame = CGRectMake(11, -7, 12, 12);
+//        
+//    }else{
+//        self.messageBadgeView.badgeText = @"";
+//        self.messageBadgeView.hidden = YES;
+//    }
+    
+    [self getUnreadMessageNum];
     
     [self getUnreadNewsNum];
     
-        //    self.userDefaults = [NSUserDefaults standardUserDefaults];
-    //    NSString *isClick = [self.userDefaults objectForKey:@"messageisclick"];
-    //    if ([isClick isEqualToString:@"yes"]) {
-    //        self.messageBadgeView.badgeText = @"";
-    //    }else{
-    //        self.messageBadgeView.badgeText = @" ";
-    //    }
+    
     
     
 }
@@ -356,6 +400,8 @@
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    //禁用侧滑返回
+    self.navigationController.interactivePopGestureRecognizer.enabled = NO;
     
     if (self.navigationController.viewControllers.count > 1) {
         self.userDefaults = [NSUserDefaults standardUserDefaults];
@@ -413,18 +459,31 @@
                     [Hud removeFromSuperview];
                     self.from = nil;
                 }];
+                [self.navigationController setViewControllers:@[self]];
             }
         }
         
     }
-    //从navigationController中删除别的视图控制器，使该页面无法右滑跳转
-    [self.navigationController setViewControllers:@[self]];
+    //从navigationController中删除多余的视图控制器
+//    if (self.navigationController.viewControllers.count > 1) {
+//        NSInteger VCCount = self.navigationController.viewControllers.count;
+//        if (self.newsViewController) {//保留新闻知识页面做缓存
+//            [self.navigationController setViewControllers:@[self.navigationController.viewControllers[VCCount-2],self]];
+//        }else{
+//            [self.navigationController setViewControllers:@[self]];
+//        }
+//    }
+    
+    
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     [MobClick endLogPageView:@"主页面"];
+    
+    self.navigationController.interactivePopGestureRecognizer.enabled = YES;
 }
 
 -(void)goToScanRecordViewController
@@ -444,14 +503,30 @@
     [userDefaults synchronize];
     self.newsBadgeView.badgeText = @"";
     
-    [self.navigationController pushViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"newsViewController"] animated:YES];
+    //NSLog(@"%@",self.navigationController.viewControllers);
+    if (self.newsViewController && self.unReadNewsNum == 0) {
+        CATransition* transition = [CATransition animation];
+        transition.type = kCATransitionMoveIn;//可更改为其他方式
+        transition.subtype = kCATransitionFromRight;//可更改为其他方式
+        [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
+        [self.navigationController popToViewController:self.newsViewController animated:NO];
+    }else{
+        [self.navigationController pushViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"newsViewController"] animated:YES];
+    }
 }
 
 -(void)goToMessageViewController
 {
-    self.messageBadgeView.badgeText = @"";
-    self.messageBadgeView.hidden = YES;
+//    self.messageBadgeView.badgeText = @"";
+//    self.messageBadgeView.hidden = YES;
     //[self.userDefaults setObject:@"yes" forKey:@"messageisclick"];
+    
+    NSDate *nowdate = [NSDate date];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:nowdate forKey:@"readMessageDate"];
+    [userDefaults synchronize];
+    self.newsBadgeView.badgeText = @"";
+    
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
     [self.navigationController pushViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"messageViewController"] animated:YES];
 }

@@ -99,8 +99,8 @@
     self.tableView.tableFooterView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 40)];
     UILabel *label = [[UILabel alloc]init];
     NSMutableAttributedString *AttributedStr = [[NSMutableAttributedString alloc]initWithString:@"如需咨询，请加入官方QQ群:"];
-    [AttributedStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12.0] range:NSMakeRange(0, AttributedStr.length)];
-    [AttributedStr addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x7e7e7e) range:NSMakeRange(0, AttributedStr.length)];
+    [AttributedStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13.0] range:NSMakeRange(0, AttributedStr.length)];
+    [AttributedStr addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x909090) range:NSMakeRange(0, AttributedStr.length)];
     label.attributedText = AttributedStr;
     
     [self.tableView.tableFooterView addSubview:label];
@@ -114,7 +114,7 @@
     UITapGestureRecognizer *qqTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(qqClick:)];
     [qqLabel addGestureRecognizer:qqTap];
     NSMutableAttributedString *qqAttributedStr = [[NSMutableAttributedString alloc]initWithString:kqqNum];
-    [qqAttributedStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12.0] range:NSMakeRange(0, qqAttributedStr.length)];
+    [qqAttributedStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13.0] range:NSMakeRange(0, qqAttributedStr.length)];
     [qqAttributedStr addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:NSMakeRange(0, qqAttributedStr.length)];
     [qqAttributedStr addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(0, qqAttributedStr.length)];
     qqLabel.attributedText = qqAttributedStr;
@@ -136,9 +136,9 @@
 }
 -(void)qqClick:(UIGestureRecognizer *)tap
 {
-    UIAlertController *copyAlert = [UIAlertController alertControllerWithTitle:@"复制该QQ号" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *copyAlert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"复制到剪切板" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
         [pasteboard setString:kqqNum];
         MBProgressHUD *Hud = [[MBProgressHUD alloc] initWithView:self.view];
@@ -238,6 +238,7 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     }
+    cell.textLabel.font = [UIFont systemFontOfSize:15];
     if (indexPath.row == 0) {
         cell.textLabel.text = @"意见反馈";
     }else if (indexPath.row == 1){
