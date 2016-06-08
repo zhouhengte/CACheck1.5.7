@@ -9,7 +9,7 @@
 #import "PasswordViewController.h"
 #import "NSString+MD5.h"
 
-@interface PasswordViewController ()
+@interface PasswordViewController ()<UITextFieldDelegate>
 
 @property (strong,nonatomic)UITextField *oldPasswordTextField;
 @property (strong,nonatomic)UITextField *freshPasswordTextField;
@@ -238,6 +238,9 @@
     }];
     self.phoneNumTextField = [[UITextField alloc]init];
     _phoneNumTextField.placeholder = @"请输入手机号";
+    _phoneNumTextField.returnKeyType = UIReturnKeyNext;
+    _phoneNumTextField.tag = 1001;
+    _phoneNumTextField.delegate = self;
     [_phoneNumTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _phoneNumTextField.font = [UIFont systemFontOfSize:14];
     [self.phoneNumTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
@@ -270,8 +273,8 @@
     [_verificationButton addTarget:self action:@selector(sendVerification:) forControlEvents:UIControlEventTouchUpInside];
     _verificationButton.titleLabel.font = [UIFont systemFontOfSize:14];
     self.verificationButton.userInteractionEnabled = NO;
-    [self.verificationButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-    self.verificationButton.layer.borderColor = UIColorFromRGB(0x7e7e7e).CGColor;
+    [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+    self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     [_verificationButton.layer setMasksToBounds:YES];
     [_verificationButton.layer setCornerRadius:6.0]; //设置矩圆角半径
     [_verificationButton.layer setBorderWidth:1.0];   //边框宽度
@@ -284,6 +287,9 @@
     }];
     self.verificationTextField = [[UITextField alloc]init];
     _verificationTextField.placeholder = @"请输入验证码";
+    _verificationTextField.returnKeyType = UIReturnKeyNext;
+    _verificationTextField.tag = 1002;
+    _verificationTextField.delegate = self;
     [_verificationTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _verificationTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_verificationTextField];
@@ -312,6 +318,9 @@
     }];
     self.freshPasswordTextField = [[UITextField alloc]init];
     _freshPasswordTextField.placeholder = @"请输入新密码";
+    _freshPasswordTextField.returnKeyType = UIReturnKeyNext;
+    _freshPasswordTextField.tag = 1003;
+    _freshPasswordTextField.delegate = self;
     [_freshPasswordTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _freshPasswordTextField.secureTextEntry = YES;
     _freshPasswordTextField.font = [UIFont systemFontOfSize:14];
@@ -341,6 +350,8 @@
     }];
     self.repeatPasswordTextField = [[UITextField alloc]init];
     _repeatPasswordTextField.placeholder = @"请再次输入新密码";
+    _repeatPasswordTextField.tag = 1004;
+
     [_repeatPasswordTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _repeatPasswordTextField.secureTextEntry = YES;
     _repeatPasswordTextField.font = [UIFont systemFontOfSize:14];
@@ -388,8 +399,8 @@
         _confirmButton.backgroundColor = UIColorFromRGB(0xdcdcdc);
         
         self.verificationButton.userInteractionEnabled = NO;
-        [self.verificationButton setTitleColor:UIColorFromRGB(0x7e7e7e) forState:UIControlStateNormal];
-        self.verificationButton.layer.borderColor = UIColorFromRGB(0x7e7e7e).CGColor;
+        [self.verificationButton setTitleColor:UIColorFromRGB(0xb4b4b4) forState:UIControlStateNormal];
+        self.verificationButton.layer.borderColor = UIColorFromRGB(0xb4b4b4).CGColor;
     }else{
         _confirmButton.userInteractionEnabled = YES;
         //[_confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -610,6 +621,15 @@
         }
     }
 
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textField.returnKeyType==UIReturnKeyNext){
+        [[self.view viewWithTag:textField.tag+1 ] becomeFirstResponder];
+        return NO;
+    }
+    return YES;
 }
 
 // 正则判断手机号码地址格式

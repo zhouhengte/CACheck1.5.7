@@ -13,6 +13,7 @@
 #import "MobClick.h"
 #import "UnknowViewController.h"
 #import "UnrecognizedViewController.h"
+#import "UIButton+EnlargeEdge.h"
 
 @import AVFoundation;
 
@@ -451,6 +452,8 @@
                     label.textColor = UIColorFromRGB(0x3e3e3e);
                     [self.alert addSubview:label];
                     
+                    
+                    
                     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
                     button.frame = CGRectMake(label.frame.origin.x, CGRectGetMaxY(label.frame) + 16/568.0*kScreenHeight, self.alert.frame.size.width - imageView.frame.size.width - 14/320.0*kScreenWidth - 17/320.0*kScreenWidth, 30/320.0*kScreenWidth);
                     //点击方法还未实现，实现时记得去除扫描框，其实不去除好像也没事
@@ -484,6 +487,11 @@
                     label3.textColor = UIColorFromRGB(0x646464);
                     [self.alert addSubview:label3];
                     
+                    UIButton *closeButton = [[UIButton alloc]initWithFrame:CGRectMake(CGRectGetMaxX(label2.frame), label.frame.origin.y, 10, 10)];
+                    [closeButton setImage:[UIImage imageNamed:@"叉"] forState:UIControlStateNormal];
+                    [closeButton addTarget:self action:@selector(closeAlert:) forControlEvents:UIControlEventTouchUpInside];
+                    [closeButton setEnlargeEdge:20];
+                    [self.alert addSubview:closeButton];
                     
                     [self.alert addSubview:imageView];
                 }
@@ -630,7 +638,12 @@
     return[scan scanFloat:&val] && [scan isAtEnd];
 }
 
-
+-(void)closeAlert:(UIButton *)sender
+{
+    NSLog(@"closeAlert");
+    [self.alert removeFromSuperview];
+    [_session startRunning];
+}
 
 
 //获取当前日期

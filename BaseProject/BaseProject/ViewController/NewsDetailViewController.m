@@ -25,6 +25,7 @@
 @property (nonatomic,strong)UIImage *image;
 @property (nonatomic,strong)UIView *grayBackground;
 @property (nonatomic,strong)UIView *shareView;
+@property (nonatomic,strong)UIButton *rightButton;
 
 @end
 
@@ -98,14 +99,14 @@
     [button addTarget:self action:@selector(tapBack:) forControlEvents:UIControlEventTouchDown];
     [button addTarget:self action:@selector(tapUp:) forControlEvents:UIControlEventTouchUpOutside];
     
-    UIButton *rightButton = [[UIButton alloc]init];
-    [rightButton setEnlargeEdge:20];
-    [rightButton setImage:[UIImage imageNamed:@"分享"] forState:UIControlStateNormal];
-    [rightButton setImage:[UIImage imageNamed:@"分享按下"] forState:UIControlStateHighlighted];
-    [rightButton.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    [rightButton addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:rightButton];
-    [rightButton mas_makeConstraints:^(MASConstraintMaker *make) {
+    self.rightButton = [[UIButton alloc]init];
+    [_rightButton setEnlargeEdge:20];
+    [_rightButton setImage:[UIImage imageNamed:@"分享"] forState:UIControlStateNormal];
+    [_rightButton setImage:[UIImage imageNamed:@"分享按下"] forState:UIControlStateHighlighted];
+    [_rightButton.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [_rightButton addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_rightButton];
+    [_rightButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(-10);
         make.top.mas_equalTo(35);
         make.size.mas_equalTo(CGSizeMake(17, 17));
@@ -574,6 +575,8 @@
 #pragma mark --- UIWebViewDelegate
 //开始加载网页
 - (void)webViewDidStartLoad:(UIWebView *)webView {
+    _rightButton.userInteractionEnabled = NO;
+    _rightButton.alpha = 0.5;
     //设置状态条(status bar)的activityIndicatorView开始动画
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
@@ -597,12 +600,15 @@
 
 //成功加载完毕
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    [self performSelector:@selector(loadEnd) withObject:nil afterDelay:1];
+
+    [self performSelector:@selector(loadEnd) withObject:nil afterDelay:0];
     
 }
 
 -(void)loadEnd
 {
+    _rightButton.userInteractionEnabled = YES;
+    _rightButton.alpha = 1;
     //设置indicatorView动画停止
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self.activityIndicator stopAnimating];

@@ -10,7 +10,7 @@
 #import "NSString+MD5.h"
 #import "MainViewController.h"
 
-@interface RegistViewController ()
+@interface RegistViewController ()<UITextFieldDelegate>
 @property (strong, nonatomic)  UIButton *registButton;
 //发送验证码
 @property (strong, nonatomic)  UIButton *verificationButton;
@@ -155,6 +155,9 @@
     }];
     self.phoneNumTextField = [[UITextField alloc]init];
     _phoneNumTextField.placeholder = @"请输入手机号";
+    _phoneNumTextField.returnKeyType = UIReturnKeyNext;
+    _phoneNumTextField.tag = 1001;
+    _phoneNumTextField.delegate = self;
     [_phoneNumTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _phoneNumTextField.font = [UIFont systemFontOfSize:14];
     [self.phoneNumTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
@@ -201,6 +204,9 @@
     }];
     self.verificationTextField = [[UITextField alloc]init];
     _verificationTextField.placeholder = @"请输入验证码";
+    _verificationTextField.returnKeyType = UIReturnKeyNext;
+    _verificationTextField.tag = 1002;
+    _verificationTextField.delegate = self;
     [_verificationTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _verificationTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_verificationTextField];
@@ -229,6 +235,7 @@
     }];
     self.passwordTextField = [[UITextField alloc]init];
     _passwordTextField.placeholder = @"请输入6位以上密码";
+    _passwordTextField.tag = 1003;
     [_passwordTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _passwordTextField.secureTextEntry = YES;
     _passwordTextField.font = [UIFont systemFontOfSize:14];
@@ -435,6 +442,15 @@
 //        NSLog(@"请求失败--------%@",error);
 //    }];
 
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textField.returnKeyType==UIReturnKeyNext){
+        [[self.view viewWithTag:textField.tag+1 ] becomeFirstResponder];
+        return NO;
+    }
+    return YES;
 }
 
 

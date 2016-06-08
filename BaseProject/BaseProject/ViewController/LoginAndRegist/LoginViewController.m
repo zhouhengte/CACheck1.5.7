@@ -16,7 +16,7 @@
 #define kScreenWidthScale (self.view.bounds.size.width/320.0)
 #define kQQappid @"1104866715"
 
-@interface LoginViewController () <MBProgressHUDDelegate>
+@interface LoginViewController () <MBProgressHUDDelegate,UITextFieldDelegate>
 
 
 @property (strong,nonatomic) MBProgressHUD *hud;
@@ -135,6 +135,9 @@
     }];
     self.userNameTextField = [[UITextField alloc]init];
     //_userNameTextField.keyboardType = UIKeyboardTypeASCIICapable;
+    _userNameTextField.returnKeyType = UIReturnKeyNext;
+    _userNameTextField.tag = 101;
+    _userNameTextField.delegate = self;
     [self.userNameTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
     _userNameTextField.font = [UIFont systemFontOfSize:14];
     _userNameTextField.placeholder = @"请输入账号或手机号";
@@ -545,7 +548,13 @@
     }];
 }
 
-
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if(textField.returnKeyType==UIReturnKeyNext){
+        [_passwordTextField becomeFirstResponder];
+        return NO;
+    }
+    return YES;
+}
 
 
 

@@ -239,6 +239,7 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     }
     cell.textLabel.font = [UIFont systemFontOfSize:15];
+    cell.textLabel.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];
     if (indexPath.row == 0) {
         cell.textLabel.text = @"意见反馈";
     }else if (indexPath.row == 1){

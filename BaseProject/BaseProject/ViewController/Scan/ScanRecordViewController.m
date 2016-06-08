@@ -247,15 +247,16 @@
     btn.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
     
     [btn.layer setCornerRadius:6.0];
-    [btn addTarget:self action:@selector(goToScanViewController) forControlEvents:UIControlEventTouchUpInside];
+    [btn addTarget:self action:@selector(goToScanViewController:) forControlEvents:UIControlEventTouchUpInside];
     btn.tag = 102;
     [btn addTarget:self action:@selector(tapBack:) forControlEvents:UIControlEventTouchDown];
     [btn addTarget:self action:@selector(tapUp:) forControlEvents:UIControlEventTouchUpOutside];
 //    NSLog(@"%@",self.view.subviews);
 }
 
--(void)goToScanViewController
+-(void)goToScanViewController:(UIButton *)sender
 {
+    sender.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
     [self.navigationController pushViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"scanViewController"] animated:YES];
 }
 

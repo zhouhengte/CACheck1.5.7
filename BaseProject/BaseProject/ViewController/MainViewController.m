@@ -140,7 +140,7 @@
         self.newsBadgeView = [[JSBadgeView alloc]initWithParentView:_newsButton alignment:JSBadgeViewAlignmentTopRight];
         self.newsBadgeView.badgePositionAdjustment = CGPointMake(-10, 15);
         _newsBadgeView.badgeTextFont = [UIFont systemFontOfSize:14];
-        _newsBadgeView.badgeStrokeWidth = 2.0;
+        _newsBadgeView.badgeStrokeWidth = 5.0;
     }
     return _newsButton;
 }
@@ -299,7 +299,7 @@
     NSString *token = [manager.requestSerializer valueForHTTPHeaderField:@"CA-Token"];
     
     NSDate *readNewsDate = [userDefaults objectForKey:@"readNewsDate"];
-    NSLog(@"readNewsDate:%@",readNewsDate);
+    //NSLog(@"readNewsDate:%@",readNewsDate);
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.timeZone = [NSTimeZone localTimeZone];
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
@@ -310,7 +310,7 @@
         //NSDictionary *dic = @{@"lasttime":@"2016-06-01 12:00"};//获取截止固定日期的未读新闻数
         NSLog(@"paramDic:%@",dic);
         [manager POST:url parameters:dic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-            NSLog(@"responseObject:%@",responseObject);
+            //NSLog(@"responseObject:%@",responseObject);
             if ([responseObject[@"Result"]integerValue] == 0) {
                 self.unReadNewsNum = [responseObject[@"UnreadNum"]integerValue];
                 if (_unReadNewsNum != 0) {

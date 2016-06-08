@@ -246,7 +246,6 @@
         [self.webView goBack];
         
     } else {
-        //[self.navigationController popViewControllerAnimated:YES];
         sender.alpha = 1.0;
         CATransition* transition = [CATransition animation];
         transition.type = kCATransitionMoveIn;//可更改为其他方式

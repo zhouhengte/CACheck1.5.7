@@ -10,7 +10,7 @@
 
 #define kQQappid @"1104866715"
 
-@interface ThirdTelVerificationViewController ()
+@interface ThirdTelVerificationViewController ()<UITextFieldDelegate>
 
 @property (nonatomic,strong) UITextField *phoneNumTextField;
 @property (nonatomic,strong) UITextField *verificationTextField;
@@ -38,6 +38,9 @@
     }];
     self.phoneNumTextField = [[UITextField alloc]init];
     _phoneNumTextField.placeholder = @"请输入手机号";
+    _phoneNumTextField.returnKeyType = UIReturnKeyNext;
+    _phoneNumTextField.tag = 1001;
+    _phoneNumTextField.delegate = self;
     [_phoneNumTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _phoneNumTextField.font = [UIFont systemFontOfSize:14];
     [self.phoneNumTextField addTarget:self  action:@selector(valueChanged:)  forControlEvents:UIControlEventAllEditingEvents];
@@ -84,6 +87,7 @@
     }];
     self.verificationTextField = [[UITextField alloc]init];
     _verificationTextField.placeholder = @"请输入验证码";
+    _verificationTextField.tag = 1002;
     [_verificationTextField setValue:UIColorFromRGB(0xa0a0a0) forKeyPath:@"_placeholderLabel.textColor"];
     _verificationTextField.font = [UIFont systemFontOfSize:14];
     [self.view addSubview:_verificationTextField];
@@ -307,6 +311,15 @@
         
     }
     
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textField.returnKeyType==UIReturnKeyNext){
+        [[self.view viewWithTag:textField.tag+1 ] becomeFirstResponder];
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - 保存数据到NSUserDefaults
