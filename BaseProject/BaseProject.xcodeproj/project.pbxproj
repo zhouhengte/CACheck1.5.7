@@ -27,6 +27,7 @@
 		2FC7DB2E1C476A60005A60BA /* RecordTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC7DB2D1C476A60005A60BA /* RecordTableViewCell.m */; };
 		2FC7DB311C476C4A005A60BA /* historyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC7DB301C476C49005A60BA /* historyModel.m */; };
 		2FC7DB341C4797B5005A60BA /* NewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC7DB331C4797B5005A60BA /* NewsViewController.m */; };
+		2FCE4E571D128C8B00EE2224 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCE4E561D128C8B00EE2224 /* AdSupport.framework */; };
 		2FD66A3F1CB3AAE2004FBFD9 /* MessageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FD66A3D1CB3AAE2004FBFD9 /* MessageTableViewCell.m */; };
 		2FD66A401CB3AAE2004FBFD9 /* MessageTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2FD66A3E1CB3AAE2004FBFD9 /* MessageTableViewCell.xib */; };
 		2FD84F451CD0561B001A58E6 /* UIButton+EnlargeEdge.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FD84F441CD0561B001A58E6 /* UIButton+EnlargeEdge.m */; };
@@ -145,6 +146,7 @@
 		2FC7DB301C476C49005A60BA /* historyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = historyModel.m; sourceTree = "<group>"; };
 		2FC7DB321C4797B5005A60BA /* NewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsViewController.h; sourceTree = "<group>"; };
 		2FC7DB331C4797B5005A60BA /* NewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsViewController.m; sourceTree = "<group>"; };
+		2FCE4E561D128C8B00EE2224 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		2FD66A3C1CB3AAE2004FBFD9 /* MessageTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageTableViewCell.h; sourceTree = "<group>"; };
 		2FD66A3D1CB3AAE2004FBFD9 /* MessageTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageTableViewCell.m; sourceTree = "<group>"; };
 		2FD66A3E1CB3AAE2004FBFD9 /* MessageTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageTableViewCell.xib; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FCE4E571D128C8B00EE2224 /* AdSupport.framework in Frameworks */,
 				2FDDA1221C61F46500BAEFEB /* libz.tbd in Frameworks */,
 				2FDCC3341CE3057000E18056 /* libstdc++.tbd in Frameworks */,
 				2FDA1A9C1CE47564000B7778 /* libGumbo.a in Frameworks */,
@@ -535,6 +538,7 @@
 		476F2325F3A137DEE1942D98 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2FCE4E561D128C8B00EE2224 /* AdSupport.framework */,
 				2FDCC3331CE3057000E18056 /* libstdc++.tbd */,
 				2FDCC3311CE3056400E18056 /* CoreTelephony.framework */,
 				2FDCC32F1CE3055900E18056 /* libsqlite3.tbd */,
@@ -1093,8 +1097,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: ZheJiang Cloutech Technology Co., Ltd. (7TW99MF2U5)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZheJiang Cloutech Technology Co., Ltd. (7TW99MF2U5)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				GCC_PREFIX_HEADER = "$(PRODUCT_NAME)/PrefixHeader.pch";
 				INFOPLIST_FILE = BaseProject/Info.plist;

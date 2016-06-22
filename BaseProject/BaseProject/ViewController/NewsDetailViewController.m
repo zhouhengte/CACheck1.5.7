@@ -497,7 +497,13 @@
         OCGumboElement *element = document.Query(@"body").find(@".context").find(@"img").first();
         //如果该页面存在图片
         if (element) {
-            self.imageUrlString = [NSString stringWithFormat:@"%@%@",kUrl,element.attr(@"src")];
+            if ([[element.attr(@"src") substringToIndex:[kUrl length]] isEqualToString:kUrl]) {
+                self.imageUrlString = element.attr(@"src");
+            }else if([[element.attr(@"src") substringToIndex:[kUrl length]+1] isEqualToString:@"http://appserver.cieway.com"]){
+                self.imageUrlString = element.attr(@"src");
+            }else{
+                self.imageUrlString = [NSString stringWithFormat:@"%@%@",kUrl,element.attr(@"src")];
+            }
             NSLog(@"src = %@", self.imageUrlString);
             self.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:self.imageUrlString]]];
             NSLog(@"image = %@",self.image);

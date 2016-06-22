@@ -356,7 +356,20 @@
     updateButton.layer.borderColor = [UIColor groupTableViewBackgroundColor].CGColor;
     [self addSubview:updateButton];
     [updateButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.bottom.right.mas_equalTo(self);
+        make.left.bottom.mas_equalTo(self);
+        make.right.mas_equalTo(-kScreenWidth/2);
+        make.height.mas_equalTo(48);
+    }];
+    
+    UIButton *commentButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [commentButton setTitle:@"评价商品" forState:UIControlStateNormal];
+    [commentButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    commentButton.backgroundColor = UIColorFromRGB(0x34b5fe);
+    [commentButton addTarget:self action:@selector(commentClick) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:commentButton];
+    [commentButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.bottom.mas_equalTo(self);
+        make.left.mas_equalTo(updateButton.mas_right);
         make.height.mas_equalTo(48);
     }];
     
@@ -393,5 +406,9 @@
 -(void)updateClick
 {
     self.updateBlock();
+}
+-(void)commentClick
+{
+    self.commentBlock();
 }
 @end

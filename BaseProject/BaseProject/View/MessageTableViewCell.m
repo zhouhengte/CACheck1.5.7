@@ -25,17 +25,38 @@
     
     self.bottomLabel.textColor = UIColorFromRGB(0x24b5fe);
     
-    NSDate *duedate = messageDic[@"duedate"];
-    NSDate *now = [NSDate date];
-    NSTimeInterval timeInterval = [duedate timeIntervalSinceDate:now];
-    int remainingDays = 0;
-    if (timeInterval <= 0) {
-        remainingDays = 0;
-        self.titleLabel.text = [NSString stringWithFormat:@"您的商品:\"%@\"已过期,请查看", messageDic[@"productname"]];
+//    NSDate *duedate = messageDic[@"duedate"];
+//    NSDate *now = [NSDate date];
+//    NSTimeInterval timeInterval = [duedate timeIntervalSinceDate:now];
+//    int remainingDays = 0;
+//    if (timeInterval <= 0) {
+//        remainingDays = 0;
+//        self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"已过期,请查看", messageDic[@"productname"]];
+//    }else{
+//        remainingDays = ((int)timeInterval)/(3600*24)+1;
+//        //self.titleLabel.text = [NSString stringWithFormat:@"请注意您扫描过的\"%@\"保质期还剩%d天", messageDic[@"productname"],remainingDays];
+//        self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"即将过期，请查看", messageDic[@"productname"]];
+//    }
+    
+    if ([messageDic[@"type"] integerValue] == 1) {
+        self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"即将过期，请查看", messageDic[@"productname"]];
+    }else if ([messageDic[@"type"] integerValue] == 2) {
+        self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"已过期,请查看", messageDic[@"productname"]];
+    }else if ([messageDic[@"type"] integerValue] == 3) {
+        self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"已使用7天了，去评价一下吧～", messageDic[@"productname"]];
     }else{
-        remainingDays = ((int)timeInterval)/(3600*24)+1;
-        //self.titleLabel.text = [NSString stringWithFormat:@"请注意您扫描过的\"%@\"保质期还剩%d天", messageDic[@"productname"],remainingDays];
-        self.titleLabel.text = [NSString stringWithFormat:@"您的商品:\"%@\"即将过期，请查看", messageDic[@"productname"]];
+        NSDate *duedate = messageDic[@"duedate"];
+        NSDate *now = [NSDate date];
+        NSTimeInterval timeInterval = [duedate timeIntervalSinceDate:now];
+        int remainingDays = 0;
+        if (timeInterval <= 0) {
+            remainingDays = 0;
+            self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"已过期,请查看", messageDic[@"productname"]];
+        }else{
+            remainingDays = ((int)timeInterval)/(3600*24)+1;
+            //self.titleLabel.text = [NSString stringWithFormat:@"请注意您扫描过的\"%@\"保质期还剩%d天", messageDic[@"productname"],remainingDays];
+            self.titleLabel.text = [NSString stringWithFormat:@"您的商品\"%@\"即将过期，请查看", messageDic[@"productname"]];
+        }
     }
     self.titleLabel.textColor = UIColorFromRGB(0x353535);
     
@@ -45,12 +66,7 @@
     self.leftImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.leftImageView.clipsToBounds = YES;
     
-    NSDate *date = [NSDate date];
-    if (timeInterval <= 0) {
-        
-    }else{
-        date = messageDic[@"firedate"];
-    }
+    NSDate *date = messageDic[@"firedate"];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.timeZone = [NSTimeZone localTimeZone];
     [dateFormatter setDateFormat:@"MM-dd HH:mm"];

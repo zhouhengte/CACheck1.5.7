@@ -14,6 +14,7 @@
 @property (nonatomic,copy)void (^confirmBlock)(NSDate *pickDate);
 @property (nonatomic,copy)void (^closeBlock)();
 @property (nonatomic,copy)void (^updateBlock)();
+@property (nonatomic,copy)void (^commentBlock)();
 @property (nonatomic,strong) NSDate *date;
 
 -(instancetype)initWithFrame:(CGRect)frame andJudgeStr:(NSString *)judgeStr;

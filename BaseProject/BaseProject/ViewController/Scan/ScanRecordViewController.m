@@ -10,6 +10,7 @@
 #import "RecordTableViewCell.h"
 #import "RecordDetailViewController.h"
 #import "MobClick.h"
+#import "UIAlertView+Blocks.h"
 
 @interface ScanRecordViewController () <UITableViewDataSource,UITableViewDelegate>
 
@@ -22,6 +23,13 @@
 
 @property (nonatomic , strong)UIButton *btn;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic , strong) UIButton *rightButton;
+@property (nonatomic , strong) UIButton *cancelButton;
+@property (nonatomic , strong) UIView *deleteView;
+@property (nonatomic , strong) NSMutableArray *deleteArray;
+@property (nonatomic , strong) NSMutableArray *deleteIndexPathArray;
+@property (nonatomic , assign) BOOL allSelected;
 
 @end
 
@@ -45,20 +53,30 @@
     return _keyArray;
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.backgroundColor = UIColorFromRGB(0xf0f0f0);
     self.tableView.tableFooterView = [[UIView alloc] init];
     self.tableView.separatorColor = UIColorFromRGB(0xe8e8e5);
-    self.view.backgroundColor = UIColorFromRGB(0xf0f0f0);
+//    self.view.backgroundColor = UIColorFromRGB(0xf0f0f0);
+    self.tableView.allowsMultipleSelectionDuringEditing = YES;
     // tableViewCell 分割线
     //self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
+    self.deleteArray = [NSMutableArray array];
+    self.deleteIndexPathArray = [NSMutableArray array];
+    self.allSelected = NO;
+    
     //重新设置导航栏，隐藏原生导航栏，手动绘制新的导航栏，使右滑手势跳转时能让导航栏跟着变化
     [self setNavigationBar];
+    
+    
+    
     
     
     NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -67,6 +85,9 @@
     NSString *plistPath = [filePath stringByAppendingPathComponent:@"test.plist"];
     NSArray * arrayFromfile = [NSArray arrayWithContentsOfFile:plistPath];
     self.dataArray = [NSMutableArray arrayWithArray: arrayFromfile];
+    
+    
+    
     
     
     NSString *datePlistPath = [filePath stringByAppendingPathComponent:@"date.plist"];
@@ -110,6 +131,15 @@
         make.height.mas_equalTo(44);
     }];
     
+    self.rightButton = [[UIButton alloc]init];
+    [_rightButton setTitle:@"编辑" forState:UIControlStateNormal];
+    [_rightButton addTarget:self action:@selector(rightItemAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_rightButton];
+    [_rightButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(-15);
+        make.top.mas_equalTo(20);
+        make.size.mas_equalTo(CGSizeMake(50, 44));
+    }];
     
     UIButton *button = [[UIButton alloc]init];
     [button setTitle:@"返回" forState:UIControlStateNormal];
@@ -157,6 +187,205 @@
     }
 }
 
+-(void)rightItemAction:(UIButton *)sender
+{
+    // 先修改表视图的状态
+    [self.tableView setEditing:!self.tableView.isEditing animated:YES];
+    // 判断表视图的状态,决定导航按钮上显示的文字
+    if (self.tableView.isEditing) {
+        [sender setTitle:@"取消" forState:UIControlStateNormal];
+        
+        self.deleteView = [[UIView alloc]init];
+        [self.view addSubview:_deleteView];
+        [_deleteView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.right.bottom.mas_equalTo(0);
+            make.height.mas_equalTo(49);
+        }];
+        
+        UIButton *allSelectedButton = [[UIButton alloc]init];
+        allSelectedButton.backgroundColor = [UIColor whiteColor];
+        [allSelectedButton setTitle:@"全选" forState:UIControlStateNormal];
+        allSelectedButton.titleLabel.font = [UIFont systemFontOfSize:14];
+        allSelectedButton.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, kScreenWidth/2-85);
+        [allSelectedButton setImage:[UIImage imageNamed:@"未勾选"] forState:UIControlStateNormal];
+        [allSelectedButton setImageEdgeInsets:UIEdgeInsetsMake(13, 13, 13, kScreenWidth/2-23-13)];
+        [allSelectedButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [allSelectedButton addTarget:self action:@selector(allSelectedClick:) forControlEvents:UIControlEventTouchUpInside];
+        [_deleteView addSubview:allSelectedButton];
+        [allSelectedButton mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.bottom.top.mas_equalTo(0);
+            make.width.mas_equalTo(kScreenWidth/2);
+        }];
+        
+        UIButton *deleteButton = [[UIButton alloc]init];
+        deleteButton.backgroundColor = [UIColor redColor];
+        [deleteButton setTitle:@"删除" forState:UIControlStateNormal];
+        deleteButton.titleLabel.font = [UIFont systemFontOfSize:14];
+        [deleteButton setImage:[UIImage imageNamed:@"删除icon"] forState:UIControlStateNormal];
+        [deleteButton setImageEdgeInsets:UIEdgeInsetsMake(17.25, (kScreenWidth/2-12.5)/2-15, 17.25, (kScreenWidth/2-12.5)/2+15)];
+
+        [deleteButton addTarget:self action:@selector(deleteClick:) forControlEvents:UIControlEventTouchUpInside];
+        [_deleteView addSubview:deleteButton];
+        [deleteButton mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.right.bottom.top.mas_equalTo(0);
+            make.width.mas_equalTo(kScreenWidth/2);
+        }];
+        
+        //        self.cancelButton = [[UIButton alloc]init];
+        //        _cancelButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
+        //        [_cancelButton setTitle:@"取消" forState:UIControlStateNormal];
+        //        [_cancelButton addTarget:self action:@selector(cancelClick:) forControlEvents:UIControlEventTouchUpInside];
+        //        [self.view addSubview:_cancelButton];
+        //        [_cancelButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        //            make.left.mas_equalTo(5);
+        //            make.top.mas_equalTo(20);
+        //            make.size.mas_equalTo(CGSizeMake(80, 44));
+        //        }];
+        //[self.tableView reloadData];
+    }else{
+        [sender setTitle:@"编辑" forState:UIControlStateNormal];
+        [_deleteIndexPathArray removeAllObjects];
+        [_deleteArray removeAllObjects];
+        [_deleteView removeFromSuperview];
+        _deleteView = nil;
+        //        [[[UIAlertView alloc]initWithTitle:nil message:@"确认删除" cancelButtonItem:[RIButtonItem itemWithLabel:@"取消" action:^{
+        //            [self cancelClick:_cancelButton];
+        //        }] otherButtonItems:[RIButtonItem itemWithLabel:@"确定" action:^{
+        //            [sender setTitle:@"编辑" forState:UIControlStateNormal];
+        //            [self.messageArray removeObjectsInArray:_deleteArray];
+        //            [self.tableView deleteRowsAtIndexPaths:_deleteIndexPathArray withRowAnimation:UITableViewRowAnimationLeft];
+        //            [_deleteIndexPathArray removeAllObjects];
+        //            [_cancelButton removeFromSuperview];
+        //
+        //            //找到documents文件所在的路径
+        //            NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        //            //获取第一个文件夹的路径
+        //            NSString *filePath = [path objectAtIndex:0];
+        //            //把testPlist文件加入
+        //            NSString *plistPath = [filePath stringByAppendingPathComponent:@"duedate.plist"];
+        //            NSMutableArray *array = [NSMutableArray arrayWithCapacity:1];
+        //
+        //            NSArray * arrayFromfile = [NSArray arrayWithContentsOfFile:plistPath];
+        //            //            [array setArray:arrayFromfile];
+        //            [array addObjectsFromArray:arrayFromfile];
+        //            [array removeObjectsInArray:_deleteArray];
+        //            //将纪录存入本地
+        //            [array writeToFile:plistPath atomically:YES];
+        //
+        //        }], nil]show];
+        
+        
+    }
+    //[self.tableView reloadData];
+}
+
+
+-(void)allSelectedClick:(UIButton *)sender
+{
+    _allSelected = !_allSelected;
+    if (_allSelected) {
+        [sender setImage:[UIImage imageNamed:@"已勾选"] forState:UIControlStateNormal];
+        for (int row=0; row<self.dataArray.count; row++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+            [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+            [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
+            [_deleteArray addObject:[self.timeArray objectAtIndex:indexPath.row]];
+            [_deleteIndexPathArray addObject:indexPath];
+        }
+    }else{
+        [sender setImage:[UIImage imageNamed:@"未勾选"] forState:UIControlStateNormal];
+        for (int row=0; row<self.dataArray.count; row++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+            [_tableView deselectRowAtIndexPath:indexPath animated:NO];
+            [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
+        }
+        [_deleteArray removeAllObjects];
+        [_deleteIndexPathArray removeAllObjects];
+    }
+
+}
+
+-(void)deleteClick:(UIButton *)sender
+{
+    [[[UIAlertView alloc]initWithTitle:nil message:@"删除扫描记录后，商品的相关消息也将删除，确定要删除吗？" cancelButtonItem:[RIButtonItem itemWithLabel:@"取消" action:^{
+        [self cancelClick];
+    }] otherButtonItems:[RIButtonItem itemWithLabel:@"确定" action:^{
+        [_rightButton setTitle:@"编辑" forState:UIControlStateNormal];
+        
+
+        [self.dataArray removeObjectsInArray:_deleteArray];
+        [self.timeArray removeObjectsInArray:_deleteArray];
+        [self.tableView deleteRowsAtIndexPaths:_deleteIndexPathArray withRowAnimation:UITableViewRowAnimationLeft];
+        [_deleteIndexPathArray removeAllObjects];
+        [self.tableView setEditing:NO animated:YES];
+        
+        
+        NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        
+        NSString *filePath = [path objectAtIndex:0];
+        NSString *plistPath = [filePath stringByAppendingPathComponent:@"test.plist"];
+        NSArray * arrayFromfile = [NSArray arrayWithContentsOfFile:plistPath];
+        self.dataArray = [NSMutableArray arrayWithArray: arrayFromfile];
+        [self.dataArray removeObjectsInArray:_deleteArray];
+        [self.dataArray writeToFile:plistPath atomically:YES];
+        
+        NSString *datePlistPath = [filePath stringByAppendingPathComponent:@"date.plist"];
+        
+        NSArray * dateArrayFromfile = [NSArray arrayWithContentsOfFile:datePlistPath];
+        self.timeArray = [NSMutableArray arrayWithArray:dateArrayFromfile];
+        [self.timeArray removeObjectsInArray:_deleteArray];
+        [self.timeArray writeToFile:datePlistPath atomically:YES];
+
+        
+        [_deleteArray removeObjectsInArray:_timeArray];
+        //NSLog(@"deleteArray:%@",_deleteArray);
+        
+        //将消息相关内容也删除，取消推送
+        //把testPlist文件加入
+        NSString *duedatePlistPath = [filePath stringByAppendingPathComponent:@"duedate.plist"];
+        NSMutableArray *messageArray = [NSMutableArray arrayWithCapacity:1];
+        
+        NSArray *duedateArrayFromfile = [NSArray arrayWithContentsOfFile:duedatePlistPath];
+        //            [array setArray:arrayFromfile];
+        [messageArray addObjectsFromArray:duedateArrayFromfile];
+        
+        NSMutableArray *deleteMessageArray = [NSMutableArray array];
+        for (NSObject *inner in _deleteArray) {
+            if ([inner isKindOfClass:[NSDictionary class]]) {
+                NSString *code = [[(NSDictionary *)inner allKeys]firstObject];
+                //拿到 存有 所有 推送的数组
+                NSArray * notiArray = [[UIApplication sharedApplication] scheduledLocalNotifications];
+                //遍历这个数组 根据 key 拿到我们想要的 UILocalNotification
+                for (UILocalNotification * loc in notiArray) {
+                    if ([[loc.userInfo objectForKey:@"barcode"] isEqualToString:code]) {
+                        //如果该产品已存在推送，取消该推送
+                        [[UIApplication sharedApplication] cancelLocalNotification:loc];
+                    }
+                }
+                for (NSDictionary *innerDic in messageArray) {
+                    if ([[innerDic objectForKey:@"barcode"] isEqualToString:code]){
+                        [deleteMessageArray addObject:innerDic];
+                    }
+                }
+            }
+        }
+        [messageArray removeObjectsInArray:deleteMessageArray];
+        [messageArray writeToFile:duedatePlistPath atomically:YES];
+        
+        [_deleteArray removeAllObjects];
+        
+    }], nil]show];
+}
+
+-(void)cancelClick
+{
+    [self.tableView setEditing:NO animated:YES];
+    [_rightButton setTitle:@"编辑" forState:UIControlStateNormal];
+    [_deleteView removeFromSuperview];
+    _deleteView = nil;
+    [_deleteIndexPathArray removeAllObjects];
+    [_deleteArray removeAllObjects];
+}
 
 
 
@@ -338,13 +567,12 @@
     
     //设置cell
     [self configureCellIndexPath:indexPath andcell:cell];
-    //没有选中状态
-    //    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+    [cell setSelectionStyle:UITableViewCellSelectionStyleBlue];
     
-    cell.selectedBackgroundView.backgroundColor = [UIColor redColor];
-    UIView *aView = [[UIView alloc] initWithFrame:cell.contentView.frame];
-    aView.backgroundColor = UIColorFromRGB(0xf7f7f7);
-    cell.selectedBackgroundView = aView;
+//    cell.selectedBackgroundView.backgroundColor = [UIColor redColor];
+//    UIView *aView = [[UIView alloc] initWithFrame:cell.contentView.frame];
+//    aView.backgroundColor = UIColorFromRGB(0xf7f7f7);
+//    cell.selectedBackgroundView = aView;
     return cell;
 }
 
@@ -422,6 +650,27 @@
     }
 }
 
+#pragma mark - 表格的编辑模式:两问一答
+//问1:该行是否可编辑
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+    
+}
+
+//问2:该行的编辑样式
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    //        return UITableViewCellEditingStyleDelete;
+    //
+    //        return UITableViewCellEditingStyleInsert;
+    
+    return UITableViewCellEditingStyleDelete | UITableViewCellEditingStyleInsert;
+    
+}
+
+
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return 69/568.0*kScreenHeight;
@@ -429,18 +678,25 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (![tableView isEditing]) {
+        //当手指离开某行时，就让某行的选中状态消失
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        self.keyStr = self.keyArray[indexPath.row];
+        UIStoryboard *mainStoryBoard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        RecordDetailViewController *recordDetailVC = [mainStoryBoard instantiateViewControllerWithIdentifier:@"recordDetailViewController"];
+        //[self.navigationController pushViewController:loginVC animated:YES];
+        //RecordDetailViewController *recordDetailVC = [[RecordDetailViewController alloc] init];
+        recordDetailVC.judgeStr = self.keyStr;
+        recordDetailVC.sugueStr = @"list";
+        recordDetailVC.onlyStr = @"记录列表";
+        [self.navigationController pushViewController:recordDetailVC animated:YES];
+    }else{
+        [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
+        [_deleteArray addObject:[self.timeArray objectAtIndex:indexPath.row]];
+        [_deleteIndexPathArray addObject:indexPath];
+
+    }
     
-    //当手指离开某行时，就让某行的选中状态消失
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    self.keyStr = self.keyArray[indexPath.row];
-    UIStoryboard *mainStoryBoard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    RecordDetailViewController *recordDetailVC = [mainStoryBoard instantiateViewControllerWithIdentifier:@"recordDetailViewController"];
-    //[self.navigationController pushViewController:loginVC animated:YES];
-    //RecordDetailViewController *recordDetailVC = [[RecordDetailViewController alloc] init];
-    recordDetailVC.judgeStr = self.keyStr;
-    recordDetailVC.sugueStr = @"list";
-    recordDetailVC.onlyStr = @"记录列表";
-    [self.navigationController pushViewController:recordDetailVC animated:YES];
     
 
     
@@ -457,6 +713,16 @@
 
     
 }
+
+-(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self.tableView isEditing]) {
+        [_deleteArray removeObject:[self.dataArray objectAtIndex:indexPath.row]];
+        [_deleteArray removeObject:[self.timeArray objectAtIndex:indexPath.row]];
+        [_deleteIndexPathArray removeObject:indexPath];
+    }
+}
+
 
 //-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
 //    RecordDetailViewController* recordDetailVC = (RecordDetailViewController *)segue.destinationViewController;

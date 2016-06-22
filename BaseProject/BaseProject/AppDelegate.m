@@ -73,16 +73,16 @@
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     NSString *key1 = [NSString stringWithFormat:@"is_first_%@",[infoDictionary objectForKey:@"CFBundleShortVersionString"]];
     NSString *value = [settings1 objectForKey:key1];
-    if ([value isEqualToString:@"false"]) {
-        self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
-        UINavigationController *naviVC = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"contentViewController"];
-        self.window.rootViewController = naviVC;
-        [self.window makeKeyAndVisible];
-        //[self enterApp];
-        //MainViewController *mainVC = [self.storyboard instantiateViewControllerWithIdentifier:@"mainViewController"];
-        //[self presentViewController:mainVC animated:YES completion:nil];
-    }
-    if (!value) {
+//    if ([value isEqualToString:@"false"]) {
+//        self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
+//        UINavigationController *naviVC = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"contentViewController"];
+//        self.window.rootViewController = naviVC;
+//        [self.window makeKeyAndVisible];
+//        //[self enterApp];
+//        //MainViewController *mainVC = [self.storyboard instantiateViewControllerWithIdentifier:@"mainViewController"];
+//        //[self presentViewController:mainVC animated:YES completion:nil];
+//    }
+//    if (!value) {
         NSUserDefaults * setting = [NSUserDefaults standardUserDefaults];
         NSString * key = [NSString stringWithFormat:@"is_first_%@",[infoDictionary objectForKey:@"CFBundleShortVersionString"]];
         [setting setObject:[NSString stringWithFormat:@"false"] forKey:key];
@@ -91,7 +91,7 @@
         WelcomeViewController *welVC = [[UIStoryboard storyboardWithName:@"Main" bundle:nil]instantiateViewControllerWithIdentifier:@"welcomeViewController"];
         self.window.rootViewController = welVC;
         [self.window makeKeyAndVisible];
-    }
+//    }
     
     
     // ios8后，需要添加这个注册，才能得到授权(还未注册远程推送，以后实现)

@@ -180,6 +180,22 @@
         make.centerY.mas_equalTo(passwordImageView);
         make.height.mas_equalTo(38);
     }];
+    
+    UIButton *forgotPasswordButton = [[UIButton alloc]init];
+    [forgotPasswordButton setTitle:@"忘记密码" forState:UIControlStateNormal];
+    [forgotPasswordButton setTitleColor:UIColorFromRGB(0xa0a0a0) forState:UIControlStateNormal];
+    forgotPasswordButton.titleLabel.font = [UIFont systemFontOfSize:11];
+    forgotPasswordButton.layer.borderColor = UIColorFromRGB(0xa0a0a0).CGColor;
+    forgotPasswordButton.layer.borderWidth = 0.5;
+    forgotPasswordButton.layer.cornerRadius = 8;
+    [forgotPasswordButton addTarget:self action:@selector(forgotPasswordClick:) forControlEvents:UIControlEventTouchUpInside];
+    [_loginView addSubview:forgotPasswordButton];
+    [forgotPasswordButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.mas_equalTo(passwordImageView);
+        make.right.mas_equalTo(-23);
+        make.size.mas_equalTo(CGSizeMake(62.5, 16));
+    }];
+    
     UIView *passwordLineView = [[UIView alloc]init];
     passwordLineView.backgroundColor = UIColorFromRGB(0xbebebe);
     [_loginView addSubview:passwordLineView];
@@ -340,6 +356,11 @@
 -(void)tapUp:(UIButton *)button
 {
     button.alpha = 1;
+}
+
+-(void)forgotPasswordClick:(UIButton *)sender
+{
+    NSLog(@"忘记密码");
 }
 
 - (void)sinaLoginClick:(UIButton *)sender {

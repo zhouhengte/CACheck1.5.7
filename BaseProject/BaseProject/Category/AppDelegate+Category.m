@@ -100,20 +100,25 @@
 //
 //    [alert show];
     
-    [[[UIAlertView alloc] initWithTitle:@"过期提醒"
-                                message:notiMess
-                       cancelButtonItem:[RIButtonItem itemWithLabel:@"取消" action:^{
+//    [[[UIAlertView alloc] initWithTitle:@"过期提醒"
+//                                message:notiMess
+//                       cancelButtonItem:[RIButtonItem itemWithLabel:@"取消" action:^{
+//        // Handle "Cancel"
+//    }]
+//                       otherButtonItems:[RIButtonItem itemWithLabel:@"查看" action:^{
+//        UINavigationController *navigetion = (UINavigationController *)self.window.rootViewController;
+//        RecordDetailViewController *recordDetailVC = [[RecordDetailViewController alloc] init];
+//        recordDetailVC.judgeStr = [notification.userInfo objectForKey:@"barcode"];
+//        recordDetailVC.sugueStr = @"list";
+//        recordDetailVC.onlyStr = @"消息";
+//        [navigetion pushViewController:recordDetailVC animated:YES];
+//
+//    }], nil] show];
+    
+    [[[UIAlertView alloc] initWithTitle:@"过期提醒" message:notiMess cancelButtonItem:[RIButtonItem itemWithLabel:@"确定" action:^{
         // Handle "Cancel"
     }]
-                       otherButtonItems:[RIButtonItem itemWithLabel:@"查看" action:^{
-        UINavigationController *navigetion = (UINavigationController *)self.window.rootViewController;
-        RecordDetailViewController *recordDetailVC = [[RecordDetailViewController alloc] init];
-        recordDetailVC.judgeStr = [notification.userInfo objectForKey:@"barcode"];
-        recordDetailVC.sugueStr = @"list";
-        recordDetailVC.onlyStr = @"消息";
-        [navigetion pushViewController:recordDetailVC animated:YES];
-
-    }], nil] show];
+                      otherButtonItems:nil, nil] show];
 
 
      //更新显示的徽章个数

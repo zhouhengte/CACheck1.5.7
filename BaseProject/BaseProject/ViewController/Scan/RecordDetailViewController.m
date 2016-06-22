@@ -79,6 +79,10 @@
 
 @property (nonatomic , strong) NSString *typeid;
 
+@property (nonatomic , strong) UIButton *statusDescButton;
+@property (nonatomic , strong) UIButton *leftStatusButton;
+@property (nonatomic , assign) NSUInteger statusLength;
+
 @end
 
 @implementation RecordDetailViewController
@@ -375,11 +379,13 @@
     //            [array setArray:arrayFromfile];
     [array addObjectsFromArray:arrayFromfile];
     BOOL isExitStr = NO;
-    for (NSDictionary * innerDic in array) {
+    for (NSDictionary * innerDic in array)
+    {
         //判断码值
         NSString * barcode = [innerDic objectForKey:@"barcode"];
         //如果 已存在通知
-        if ([barcode isEqualToString:self.judgeStr]) {
+        if ([barcode isEqualToString:self.judgeStr])
+        {
             NSDate *date = [innerDic objectForKey:@"duedate"];
             isExitStr = YES;
             self.isSettedBottomView = [[UIView alloc]init];
@@ -514,7 +520,11 @@
                 };
 
             };
-        }
+            self.isSettedDueDateView.commentBlock = ^(){
+                [weakSelf goToCommentViewController];
+            };
+            break;
+        };
     }
     
     if (!isExitStr) {
@@ -685,7 +695,9 @@
                 //[weakSelf.isSettedBottomView removeFromSuperview];
             }];
         };
-        
+        weakSelf.isSettedDueDateView.commentBlock = ^(){
+            [weakSelf goToCommentViewController];
+        };
         
     };
     }
@@ -866,47 +878,120 @@
     
     //判断保质期是不是在10天内
     NSDate *now = [NSDate date];
+    NSDate *duedateFireDate = nil;//过期时的提醒
+    
+    NSDate *eightDayFireDate = nil;//8天后9点提醒
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.timeZone = [NSTimeZone localTimeZone];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSString *today = [dateFormatter stringFromDate:now];
+    NSDate *todayZero = [dateFormatter dateFromString:today];
+    eightDayFireDate = [NSDate dateWithTimeInterval:32400+86400*8 sinceDate:todayZero];
+    
+    
+    
     NSTimeInterval timeInterval = [date timeIntervalSinceDate:now];
     int remainingDays = ((int)timeInterval)/(3600*24)+1;
-    if (remainingDays <= 11) {
+    if (remainingDays <= 0) {
+        self.fireDate = [NSDate date];
+    }else if (remainingDays == 1){
+        duedateFireDate = [NSDate dateWithTimeInterval:32400 sinceDate:date];//过期日9点
+    }else if (remainingDays <= 11) {
         //在10天内，则发送日期为第二天9点
         self.fireDate = [NSDate dateWithTimeInterval:32400-(remainingDays-1)*86400 sinceDate:date];
         //self.fireDate = [NSDate dateWithTimeIntervalSinceNow:60];//60秒后触发
+        duedateFireDate = [NSDate dateWithTimeInterval:32400 sinceDate:date];//过期日9点
     }else{
-        //self.fireDate = [NSDate dateWithTimeInterval:32400 sinceDate:date];//过期日9点
+        duedateFireDate = [NSDate dateWithTimeInterval:32400 sinceDate:date];//过期日9点
         self.fireDate = [NSDate dateWithTimeInterval:-831600 sinceDate:date];//提前10天9点
     }
     
-    NSDictionary *dict = @{@"barcode":self.judgeStr,@"firedate":self.fireDate,@"productname":self.productName,@"imageUrl":self.imageUrl,@"duedate":date};
-    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:dict];
-    
-    BOOL isExitStr = NO;
-    //遍历数组中的每个字典
-    int i = 0;
-    for (NSDictionary * innerDic in array) {
-        //判断码值
-        NSString * barcode = [innerDic objectForKey:@"barcode"];
-        //如果 已存在
-        if ([barcode isEqualToString:self.judgeStr]) {
-            isExitStr = YES;
-            //移除原通知
-            [array removeObjectAtIndex:i];
-            //判断新通知时间是否重复
-            self.fireDate = [self checkFireDate:self.fireDate withArray:array];
-            [dic setValue:self.fireDate forKey:@"firedate"];
-            [array insertObject:dic atIndex:0];
-            break;
-        }
-        i++;
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    if (self.fireDate) {
+        NSDictionary *dict = @{@"barcode":self.judgeStr,@"firedate":self.fireDate,@"productname":self.productName,@"imageUrl":self.imageUrl,@"duedate":date,@"type":@"1"};
+        dic = [NSMutableDictionary dictionaryWithDictionary:dict];
     }
     
-    //如果不存在， 把dic添加到  array中去
-    if (!isExitStr) {
+    NSMutableDictionary *duedateDic = [NSMutableDictionary dictionary];
+    if (duedateFireDate) {
+        NSDictionary *duedateDict = @{@"barcode":self.judgeStr,@"firedate":duedateFireDate,@"productname":self.productName,@"imageUrl":self.imageUrl,@"duedate":date,@"type":@"2"};
+        duedateDic = [NSMutableDictionary dictionaryWithDictionary:duedateDict];
+    }
+    
+    NSDictionary *eightDayDict = @{@"barcode":self.judgeStr,@"firedate":eightDayFireDate,@"productname":self.productName,@"imageUrl":self.imageUrl,@"duedate":date,@"type":@"3"};
+    NSMutableDictionary *eightDayDic = [NSMutableDictionary dictionaryWithDictionary:eightDayDict];
+    
+    BOOL __block isExitStr = NO;
+    //遍历数组中的每个字典
+//    int i = 0;
+//    for (NSDictionary * innerDic in array) {
+//        //判断码值
+//        NSString * barcode = [innerDic objectForKey:@"barcode"];
+//        //如果 已存在
+//        if ([barcode isEqualToString:self.judgeStr]) {
+//            isExitStr = YES;
+//            //移除原通知
+//            [array removeObjectAtIndex:i];
+//            //判断新通知时间是否重复
+//            self.fireDate = [self checkFireDate:self.fireDate withArray:array];
+//            [dic setValue:self.fireDate forKey:@"firedate"];
+//            [array insertObject:dic atIndex:0];
+//            break;
+//        }
+//        i++;
+//    }
+    //NSLog(@"before array:%@",array);
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        //NSLog(@"obj:%@",obj);
+        if ([[obj objectForKey:@"barcode"] isEqualToString:self.judgeStr]){
+            isExitStr = YES;
+            [array removeObject:obj];
+        }
+    }];
+    //删一次好像删不干净，干脆删2次。。。
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        //NSLog(@"obj:%@",obj);
+        if ([[obj objectForKey:@"barcode"] isEqualToString:self.judgeStr]){
+            isExitStr = YES;
+            [array removeObject:obj];
+        }
+    }];
+    //NSLog(@"middle array:%@",array);
+    //判断新通知时间是否重复
+    if (self.fireDate) {
         self.fireDate = [self checkFireDate:self.fireDate withArray:array];
         [dic setValue:self.fireDate forKey:@"firedate"];
         [array insertObject:dic atIndex:0];
-        
     }
+    eightDayFireDate = [self checkFireDate:eightDayFireDate withArray:array];
+    [eightDayDic setValue:eightDayFireDate forKey:@"firedate"];
+    [array insertObject:eightDayDic atIndex:0];
+    if (duedateFireDate) {
+        duedateFireDate = [self checkFireDate:duedateFireDate withArray:array];
+        [duedateDic setValue:duedateFireDate forKey:@"firedate"];
+        [array insertObject:duedateDic atIndex:0];
+    }
+    //NSLog(@"array:%@",array);
+    
+    //如果不存在， 把dic添加到  array中去
+    if (!isExitStr) {
+        if (self.fireDate) {
+            self.fireDate = [self checkFireDate:self.fireDate withArray:array];
+            [dic setValue:self.fireDate forKey:@"firedate"];
+            [array insertObject:dic atIndex:0];
+        }
+        eightDayFireDate = [self checkFireDate:eightDayFireDate withArray:array];
+        [eightDayDic setValue:eightDayFireDate forKey:@"firedate"];
+        [array insertObject:eightDayDic atIndex:0];
+        if (duedateFireDate) {
+            duedateFireDate = [self checkFireDate:duedateFireDate withArray:array];
+            [duedateDic setValue:duedateFireDate forKey:@"firedate"];
+            [array insertObject:duedateDic atIndex:0];
+        }
+        //NSLog(@"array:%@",array);
+    }
+    
+    
     //如果推送纪录超过100，删除最后一条
     if (array.count > 100) {
         [array removeLastObject];
@@ -914,31 +999,69 @@
     //将纪录存入本地
     [array writeToFile:plistPath atomically:YES];
     
+    if (self.fireDate) {
+        //设置即将过期提醒
+        UILocalNotification *notification = [[UILocalNotification alloc] init];
+        // 设置触发通知的时间
+        notification.fireDate = self.fireDate;
+        // 时区
+        notification.timeZone = [NSTimeZone defaultTimeZone];
+        // 设置重复的间隔
+        //notification.repeatInterval = kCFCalendarUnitMinute;
+        // 通知内容
+        notification.alertBody =  @"您扫描过的商品即将过期";
+        notification.applicationIconBadgeNumber = 1;
+        // 通知被触发时播放的声音
+        notification.soundName = UILocalNotificationDefaultSoundName;
+        // 通知参数
+        NSDictionary *userDict = [NSDictionary dictionaryWithObjectsAndKeys:self.judgeStr,@"barcode",self.productName,@"productname",date,@"duedate", nil];
+        notification.userInfo = userDict;
+        // 执行通知
+        [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    }
+
     
-    //设置本地到期推送
-    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    //设置使用8天提醒
+    UILocalNotification *eightDayNotification = [[UILocalNotification alloc] init];
     // 设置触发通知的时间
-    
-    
-    //NSLog(@"fireDate=%@",self.fireDate);
-    
-    notification.fireDate = self.fireDate;
+    eightDayNotification.fireDate = eightDayFireDate;
+    NSLog(@"eightdayDate:%@",eightDayFireDate);
     // 时区
-    notification.timeZone = [NSTimeZone defaultTimeZone];
+    eightDayNotification.timeZone = [NSTimeZone defaultTimeZone];
     // 设置重复的间隔
     //notification.repeatInterval = kCFCalendarUnitMinute;
-    
     // 通知内容
-    notification.alertBody =  @"您扫描过的商品即将过期";
-    notification.applicationIconBadgeNumber = 1;
+    eightDayNotification.alertBody =  [NSString stringWithFormat:@"您的商品“%@“已使用7天了，去评价一下吧～",self.productName];
+    eightDayNotification.applicationIconBadgeNumber = 1;
     // 通知被触发时播放的声音
-    notification.soundName = UILocalNotificationDefaultSoundName;
+    eightDayNotification.soundName = UILocalNotificationDefaultSoundName;
     // 通知参数
-    NSDictionary *userDict = [NSDictionary dictionaryWithObjectsAndKeys:self.judgeStr,@"barcode",self.productName,@"productname",date,@"duedate", nil];
-
-    notification.userInfo = userDict;
+    NSDictionary *eightDayUserDict = [NSDictionary dictionaryWithObjectsAndKeys:self.judgeStr,@"barcode",self.productName,@"productname",date,@"duedate", nil];
+    eightDayNotification.userInfo = eightDayUserDict;
     // 执行通知
-    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    [[UIApplication sharedApplication] scheduleLocalNotification:eightDayNotification];
+    
+    
+    //设置已到期推送
+    if (duedateFireDate) {
+        UILocalNotification *duedateNotification = [[UILocalNotification alloc] init];
+        // 设置触发通知的时间
+        duedateNotification.fireDate = duedateFireDate;
+        // 时区
+        duedateNotification.timeZone = [NSTimeZone defaultTimeZone];
+        // 设置重复的间隔
+        //notification.repeatInterval = kCFCalendarUnitMinute;
+        // 通知内容
+        duedateNotification.alertBody =  [NSString stringWithFormat:@"您的商品“%@“已过期，请查看",self.productName];
+        duedateNotification.applicationIconBadgeNumber = 1;
+        // 通知被触发时播放的声音
+        duedateNotification.soundName = UILocalNotificationDefaultSoundName;
+        // 通知参数
+        NSDictionary *userDict = [NSDictionary dictionaryWithObjectsAndKeys:self.judgeStr,@"barcode",self.productName,@"productname",date,@"duedate", nil];
+        duedateNotification.userInfo = userDict;
+        // 执行通知
+        [[UIApplication sharedApplication] scheduleLocalNotification:duedateNotification];
+    }
 }
 
 //日期正则表达式判断
@@ -1105,6 +1228,49 @@
         [self duedataClick];
         self.onlyStr = nil;
     }
+    
+    
+    [UIView animateKeyframesWithDuration:1 delay:0.2 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.9 animations:^{
+            [self.tableView.tableHeaderView bringSubviewToFront:_statusDescButton];
+            [self.tableView.tableHeaderView bringSubviewToFront:_leftStatusButton];
+            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.width.mas_equalTo(self.statusLength*12.5+52.5);
+            }];
+            [_statusDescButton setNeedsLayout];
+            [_statusDescButton layoutIfNeeded];
+        }];
+        [UIView addKeyframeWithRelativeStartTime:0.9 relativeDuration:0.1 animations:^{
+            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.width.mas_equalTo(self.statusLength*12.5+42.5);
+            }];
+            [_statusDescButton setNeedsLayout];
+            [_statusDescButton layoutIfNeeded];
+        }];
+    } completion:^(BOOL finished) {
+        
+    }];
+    
+//    [UIView animateKeyframesWithDuration:3 delay:1 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+//        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.9 animations:^{
+//            [_scrollView bringSubviewToFront:_statusDescButton];
+//            [_scrollView bringSubviewToFront:_leftStatusButton];
+//            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
+//                make.width.mas_equalTo(90);
+//            }];
+//            [_statusDescButton setNeedsLayout];
+//            [_statusDescButton layoutIfNeeded];
+//        }];
+//        [UIView addKeyframeWithRelativeStartTime:0.9 relativeDuration:0.1 animations:^{
+//            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
+//                make.width.mas_equalTo(80);
+//            }];
+//            [_statusDescButton setNeedsLayout];
+//            [_statusDescButton layoutIfNeeded];
+//        }];
+//    } completion:^(BOOL finished) {
+//        
+//    }];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -1205,7 +1371,6 @@
             ;
         }else{
             [array addObject:dataDic];
-            
         }
     }
     //NSLog(@"!!!!%@",[array firstObject]);
@@ -1220,6 +1385,7 @@
         [self getBarCodeComment];
     }
 
+    
     
     NSArray * a = [self.wantDic objectForKey:@"ProductInfo"];
     for (NSDictionary *dict in a) {
@@ -1245,6 +1411,10 @@
     }else {
         [self getLocalPicLoop];
     }
+    
+
+    
+    
     //如果saleFag值为1，已经完成涂层验证，0:未完成涂层验证
     self.saleFlag = self.wantDic[@"SaleFlag"];
     self.CoatCode = self.wantDic[@"CoatCode"];//验证码
@@ -1366,7 +1536,7 @@
     
     [manager POST:self.requestUrl parameters:self.paramDic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject)
     {
-        //NSLog(@"responseObject:%@",responseObject);
+        NSLog(@"responseObject:%@",responseObject);
         if ([responseObject[@"Result"]integerValue] !=0 ) {
             return ;
         }
@@ -1399,6 +1569,7 @@
                 break;
             }
         }
+        self.wantDic = responseObject;//直接获取，用来操作检验状态便条
         if (self.picUrl) {
             [self getUrlPicLoop];
         }else {
@@ -2045,6 +2216,53 @@
         //self.scrollView.backgroundColor = [UIColor yellowColor];
         self.scrollView.userInteractionEnabled = YES;
         
+        //添加检验状态便条
+//        NSArray * baseInfoArray = [self.wantDic objectForKey:@"BaseInfo"];
+//        for (NSDictionary *innerDic in baseInfoArray) {
+//            if ([[innerDic objectForKey:@"key"] isEqualToString:@"StatusDesc"]) {//获取检验状态
+//                NSLog(@"检验状态:%@,color:%@",[innerDic objectForKey:@"value"],[innerDic objectForKey:@"color"]);
+//                self.statusLength = [[innerDic objectForKey:@"value"]length];
+//                self.statusDescButton = [[UIButton alloc]init];
+//                _statusDescButton.backgroundColor = [UIColor whiteColor];
+//                [_statusDescButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
+//                [self.scrollView addSubview:_statusDescButton];
+//                _statusDescButton.layer.masksToBounds = YES;
+//                _statusDescButton.layer.borderWidth = 0.5;
+//                _statusDescButton.layer.borderColor = [UIColor whiteColor].CGColor;
+//                _statusDescButton.layer.cornerRadius = 11.5;
+//                [_statusDescButton mas_makeConstraints:^(MASConstraintMaker *make) {
+//                    make.left.mas_equalTo(20);
+//                    make.bottom.mas_equalTo(287/586.0*kScreenHeight-24.5);
+//                    make.size.mas_equalTo(CGSizeMake(23, 23));
+//                }];
+//                
+//                UILabel *label = [[UILabel alloc]init];
+//                label.text = [innerDic objectForKey:@"value"];
+//                label.font = [UIFont systemFontOfSize:12];
+//                NSString * aStr = [NSString stringWithFormat:@"0x%@", [innerDic objectForKey:@"color"]];
+//                //先以16为参数告诉strtoul字符串参数表示16进制数字，然后使用0x%X转为数字类型
+//                unsigned long value = strtoul([aStr UTF8String],0,16);
+//                label.textColor = UIColorFromRGB(value);
+//                [_statusDescButton addSubview:label];
+//                [label mas_makeConstraints:^(MASConstraintMaker *make) {
+//                    make.right.mas_equalTo(-10);
+//                    make.centerY.mas_equalTo(0);
+//                }];
+//                
+//                self.leftStatusButton = [[UIButton alloc]init];
+//                //leftStatusButton.backgroundColor = [UIColor redColor];
+//                [_leftStatusButton setImage:[UIImage imageNamed:@"放行"] forState:UIControlStateNormal];
+//                [_leftStatusButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
+//                [self.scrollView addSubview:_leftStatusButton];
+//                [_leftStatusButton mas_makeConstraints:^(MASConstraintMaker *make) {
+//                    make.left.mas_equalTo(20);
+//                    make.bottom.mas_equalTo(287/586.0*kScreenHeight-20);
+//                    make.size.mas_equalTo(CGSizeMake(32, 32));
+//                }];
+//                
+//            }
+//        }
+        
         //3.向滚动视图中添加多个图片子视图
         for (int i =0; i<self.picArray.count; i++) {
             //格式化图片的名称
@@ -2070,14 +2288,7 @@
             
             //将图片视图添加到滚动视图中
             [self.scrollView addSubview:imageView];
-            
         }
-        
-        //设置下方阴影
-        UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
-        UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
-        imageViewBg.image = imageBg;
-        [self.scrollView addSubview:imageViewBg];
         
         //4.设置滚动视图的内容大小
         self.scrollView.contentSize = CGSizeMake(self.picArray.count*self.view.frame.size.width, 287/586.0*kScreenHeight);
@@ -2088,6 +2299,15 @@
         //配置滚动视图不显示水平滚动条提示
         self.scrollView.showsHorizontalScrollIndicator = NO;
         [self.tableView.tableHeaderView addSubview:self.scrollView];
+        
+        //设置下方阴影
+        UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
+        UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
+        imageViewBg.image = imageBg;
+        [self.tableView.tableHeaderView addSubview:imageViewBg];
+        
+        //添加检验状态便条
+        [self addNote];
         
         if (self.picArray.count > 1) {
             //1.创建pageControl的实例
@@ -2120,6 +2340,15 @@
         }
 
     }
+}
+
+-(void)statusDescClick:(UIButton *)sender
+{
+    NSLog(@"点击了检验状态");
+    WebViewController *webVC = [[WebViewController alloc] init];
+    webVC.url = @"http://appserver.ciqca.com/appweb/valid.jsp";
+    webVC.titleStr = @"已认证";
+    [self.navigationController pushViewController:webVC animated:YES];
 }
 
 -(void)tap:(UITapGestureRecognizer *)tap{
@@ -2172,10 +2401,83 @@
     
     [self.tableView.tableHeaderView addSubview:imageView];
     
+    //添加检验状态便条
+    [self addNote];
     
     
 }
 
+-(void)addNote
+{
+    NSArray * baseInfoArray = [self.wantDic objectForKey:@"BaseInfo"];
+    //NSLog(@"baseInfoArray:%@",baseInfoArray);
+    for (NSDictionary *innerDic in baseInfoArray) {
+        if ([[innerDic objectForKey:@"key"] isEqualToString:@"StatusDesc"]) {//获取检验状态
+            self.statusLength = [[innerDic objectForKey:@"value"]length];
+            self.statusDescButton = [[UIButton alloc]init];
+            _statusDescButton.backgroundColor = [UIColor whiteColor];
+            [_statusDescButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
+            [self.tableView.tableHeaderView addSubview:_statusDescButton];
+            _statusDescButton.layer.masksToBounds = YES;
+            _statusDescButton.layer.borderWidth = 0.5;
+            _statusDescButton.layer.borderColor = [UIColor whiteColor].CGColor;
+            _statusDescButton.layer.cornerRadius = 11.5;
+            [_statusDescButton mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(20);
+                make.bottom.mas_equalTo(-24.5);
+                make.size.mas_equalTo(CGSizeMake(23, 23));
+            }];
+            
+            UILabel *label = [[UILabel alloc]init];
+            label.text = [innerDic objectForKey:@"value"];
+            label.font = [UIFont systemFontOfSize:12];
+            NSString * aStr = [NSString stringWithFormat:@"0x%@", [innerDic objectForKey:@"color"]];
+            //先以16为参数告诉strtoul字符串参数表示16进制数字，然后使用0x%X转为数字类型
+            unsigned long value = strtoul([aStr UTF8String],0,16);
+            label.textColor = UIColorFromRGB(value);
+            [_statusDescButton addSubview:label];
+            [label mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.right.mas_equalTo(-10);
+                make.centerY.mas_equalTo(0);
+            }];
+            
+            UIImageView *triangleImageView = [[UIImageView alloc]init];
+            if ([[innerDic objectForKey:@"value"] isEqualToString:@"未检验"] || [[innerDic objectForKey:@"value"] isEqualToString:@"紧急召回"]) {
+                triangleImageView.image = [UIImage imageNamed:@"紧急召回 箭头"];
+            }else if ([[innerDic objectForKey:@"value"] isEqualToString:@"检验中"])
+            {
+                triangleImageView.image = [UIImage imageNamed:@"检验中 箭头"];
+            }else{
+                triangleImageView.image = [UIImage imageNamed:@"放行 箭头"];
+            }
+            [_statusDescButton addSubview:triangleImageView];
+            [triangleImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.size.mas_equalTo(CGSizeMake(3.5, 5));
+                make.right.mas_equalTo(-4);
+                make.centerY.mas_equalTo(0);
+            }];
+            
+            self.leftStatusButton = [[UIButton alloc]init];
+            if ([[innerDic objectForKey:@"value"] isEqualToString:@"未检验"] || [[innerDic objectForKey:@"value"] isEqualToString:@"紧急召回"]) {
+                [_leftStatusButton setImage:[UIImage imageNamed:@"紧急召回"] forState:UIControlStateNormal];
+            }else if ([[innerDic objectForKey:@"value"] isEqualToString:@"检验中"])
+            {
+                [_leftStatusButton setImage:[UIImage imageNamed:@"检验中"] forState:UIControlStateNormal];
+            }else{
+                [_leftStatusButton setImage:[UIImage imageNamed:@"放行"] forState:UIControlStateNormal];
+            }
+            [_leftStatusButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
+            [self.tableView.tableHeaderView addSubview:_leftStatusButton];
+            [_leftStatusButton mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(20);
+                make.bottom.mas_equalTo(-20);
+                make.size.mas_equalTo(CGSizeMake(32, 32));
+            }];
+            
+        }
+    }
+
+}
 
 
 #pragma mark - 字典转json串
@@ -2200,9 +2502,9 @@
     }
     
     if (section == 3) {
-        if (self.barCode != nil) {
-            return 0;
-        }
+//        if (self.barCode != nil) {
+//            return 0;
+//        }
         return 55;
     }
     if (section == tableView.numberOfSections - 1   ) {
@@ -2280,7 +2582,6 @@
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
         //return self.productInfoArray.count + 3;
-
     return self.textArray.count + 2;
 }
 
@@ -2406,22 +2707,23 @@
             {
                 ;//如果cell.textLabel为nil或者是扫描条码就不添加蓝色盾牌
             }else{
-                if ([self.countKey isEqualToString:@"1"])
-                {
-                    UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake(cell.textLabel.frame.origin.x + labelSize.width + 20, 6,12, 14)];
-                    //NSLog(@"aImageView.frame = %@",NSStringFromCGRect(aImageView.frame));
-                    //NSLog(@"width:%f",labelSize.width);
-                    if (labelSize.width > 320.0/375.0*kScreenWidth)
-                    {
-                        labelSize.width = labelSize.width - 25/375.0*kScreenWidth;
-                        aImageView.frame =CGRectMake(cell.textLabel.frame.origin.x + labelSize.width + 10, 6,14, 16);
-                    }
-                    aImageView.image = [UIImage imageNamed:@"蓝色盾牌"];
-                    [cell.contentView addSubview:aImageView];
-                    //跳转标识
-                    self.key = @"yes";
-                    self.countKey = @"2";
-                }
+                //蓝色盾牌在1.5.8移除
+//                if ([self.countKey isEqualToString:@"1"])
+//                {
+//                    UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake(cell.textLabel.frame.origin.x + labelSize.width + 20, 6,12, 14)];
+//                    //NSLog(@"aImageView.frame = %@",NSStringFromCGRect(aImageView.frame));
+//                    //NSLog(@"width:%f",labelSize.width);
+//                    if (labelSize.width > 320.0/375.0*kScreenWidth)
+//                    {
+//                        labelSize.width = labelSize.width - 25/375.0*kScreenWidth;
+//                        aImageView.frame =CGRectMake(cell.textLabel.frame.origin.x + labelSize.width + 10, 6,14, 16);
+//                    }
+//                    aImageView.image = [UIImage imageNamed:@"蓝色盾牌"];
+//                    [cell.contentView addSubview:aImageView];
+//                    //跳转标识
+//                    self.key = @"yes";
+//                    self.countKey = @"2";
+//                }
             }
             cell.textLabel.font = [UIFont boldSystemFontOfSize:17];
             cell.textLabel.textColor = UIColorFromRGB(0x353535);
@@ -2445,21 +2747,27 @@
                 [self.baseArray removeObjectAtIndex:indexPath.row];
                 [self.tableView reloadData];
             }if ([baseModel.key isEqual:@"StatusDesc"]) {//商品分为“经检验检疫放行”“不合格”“紧急召回”“检验中”4种状态，其中“不合格”，“紧急召回” “检验中”3种状态标红显示
-                cell.textLabel.font = [UIFont systemFontOfSize:13];
-                //                if ([baseModel.value isEqual:@"经检验检疫放行"]) {
-                NSString *color = baseModel.color;
-                NSString * aStr = [NSString stringWithFormat:@"0x%@", color];
                 
-                //先以16为参数告诉strtoul字符串参数表示16进制数字，然后使用0x%X转为数字类型
-                unsigned long value = strtoul([aStr UTF8String],0,16);
-                //strtoul如果传入的字符开头是“0x”,那么第三个参数是0，也是会转为十六进制的,这样写也可以：
-                //unsigned long red = strtoul([@"0x6587" UTF8String],0,0);
-                
-                //NSLog(@"转换完的数字为：%lx",value);
-#warning 此处可以获得后台传过来的color值，不用判断，
-                cell.userInteractionEnabled = NO;
-                cell.textLabel.textColor = UIColorFromRGB(value);
+                //新增动画后，将检验状态删除
+//                cell.textLabel.font = [UIFont systemFontOfSize:13];
+//                //                if ([baseModel.value isEqual:@"经检验检疫放行"]) {
+//                NSString *color = baseModel.color;
+//                NSString * aStr = [NSString stringWithFormat:@"0x%@", color];
+//                
+//                //先以16为参数告诉strtoul字符串参数表示16进制数字，然后使用0x%X转为数字类型
+//                unsigned long value = strtoul([aStr UTF8String],0,16);
+//                //strtoul如果传入的字符开头是“0x”,那么第三个参数是0，也是会转为十六进制的,这样写也可以：
+//                //unsigned long red = strtoul([@"0x6587" UTF8String],0,0);
+//                
+//                //NSLog(@"转换完的数字为：%lx",value);
+//#warning 此处可以获得后台传过来的color值，不用判断，
+//                cell.userInteractionEnabled = NO;
+//                cell.textLabel.textColor = UIColorFromRGB(value);
                 //cell.backgroundColor = [UIColor yellowColor];
+                
+                //新增动画后，将检验状态删除
+                [self.baseArray removeObjectAtIndex:indexPath.row];
+                [self.tableView reloadData];
                 
             }
             cell.textLabel.text = baseModel.value;
@@ -2603,13 +2911,14 @@
     if(indexPath.section == 0){
         if (indexPath.row == 0) {
 #warning  跳转到指定图片页面
-            if ([self.key isEqualToString:@"yes"]) {
-                //NSLog(@"点击了产品名");
-                webVC.url = @"http://appserver.ciqca.com/appweb/valid.jsp";
-                webVC.titleStr = @"已认证";
-                [self.navigationController pushViewController:webVC animated:YES];
-                //cell.selectionStyle =UITableViewCellSelectionStyleNone;
-            }
+            //1.5.8移除
+//            if ([self.key isEqualToString:@"yes"]) {
+//                //NSLog(@"点击了产品名");
+//                webVC.url = @"http://appserver.ciqca.com/appweb/valid.jsp";
+//                webVC.titleStr = @"已认证";
+//                [self.navigationController pushViewController:webVC animated:YES];
+//                //cell.selectionStyle =UITableViewCellSelectionStyleNone;
+//            }
 //            else{
 //                cell.userInteractionEnabled = NO;
 //                cell.selectionStyle =UITableViewCellSelectionStyleNone;
@@ -2627,10 +2936,10 @@
     }
     
     else{
-        if (self.codeStr != nil) {
+        //if (self.codeStr != nil) {
             webVC.titleStr = cell.titleLabel.text;
             [self.navigationController pushViewController:webVC animated:YES];
-        }
+        //}
 
     }
     

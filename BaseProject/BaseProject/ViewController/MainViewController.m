@@ -8,6 +8,7 @@
 
 #import "MainViewController.h"
 #import "JSBadgeView.h"
+#import <AdSupport/AdSupport.h>
 
 #define kScreenScale (self.view.bounds.size.height/568.0)
 #define kScreenWidthScale (self.view.bounds.size.width/320.0)
@@ -283,6 +284,8 @@
     //
     //    NSLog(@"%@", [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
     
+    NSString *identifierForAdvertising = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
+    NSLog(@"identifierForAdvertising:%@",identifierForAdvertising);
 }
 
 -(void)getUnreadNewsNum
@@ -342,6 +345,11 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSDate *readMessageDate = [userDefaults objectForKey:@"readMessageDate"];
     NSDate *now = [NSDate date];
+    if (!readMessageDate) {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:now forKey:@"readMessageDate"];
+        [userDefaults synchronize];
+    }
     if (readMessageDate) {
         for (NSDictionary *innerDic in mutableArray) {
             NSDate *firedate = innerDic[@"firedate"];
@@ -525,7 +533,7 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:nowdate forKey:@"readMessageDate"];
     [userDefaults synchronize];
-    self.newsBadgeView.badgeText = @"";
+    self.messageBadgeView.badgeText = @"";
     
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
     [self.navigationController pushViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"messageViewController"] animated:YES];

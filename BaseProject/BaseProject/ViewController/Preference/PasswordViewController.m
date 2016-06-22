@@ -434,12 +434,13 @@
         [alert show];
         sender.userInteractionEnabled = YES;
     }else{
-        NSDictionary *dic = @{@"phone":self.phoneNumTextField.text,@"openid":@"1"};
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSString *userName = [userDefaults objectForKey:@"username"];
+        NSDictionary *dic = @{@"username":userName,@"phone":self.phoneNumTextField.text,@"openid":@"1"};
         NSString *strParam = [self dictionaryToJson:dic];
         NSDictionary *paramDic = @{@"json":strParam};
         
         NSString *url = [NSString stringWithFormat:@"%@/%@",kUrl,kPushCodeUrl];
-        
         
         //  AFN POST 请求
         [manager POST:url parameters:paramDic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -451,15 +452,17 @@
                 [alert show];
                 sender.userInteractionEnabled = YES;
                 return ;
-            }else{
-                [self countDown];//倒计时
             }
             if ([responseObject[@"Result"] integerValue] != 0) {
                 //self.string = responseObject[@"FailInfo"];
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:responseObject[@"FailInfo"] delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
                 [alert  show];
-                
+                sender.userInteractionEnabled = YES;
+                return;
+            }else{
+                [self countDown];//倒计时
             }
+
             
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             NSLog(@"验证失败 %@",error);

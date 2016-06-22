@@ -17,7 +17,7 @@
 
 @import AVFoundation;
 
-@interface ScanViewController ()<AVCaptureMetadataOutputObjectsDelegate,CLLocationManagerDelegate>
+@interface ScanViewController ()<AVCaptureMetadataOutputObjectsDelegate,CLLocationManagerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate>
 
 //管道--连接输出 输入流
 @property(nonatomic,strong)AVCaptureSession *session;
@@ -38,6 +38,8 @@
 
 @property (nonatomic , strong)UIView *alert;
 @property (nonatomic , copy)NSString *labelText;
+
+@property (nonatomic , strong)CIContext *context;
 
 @end
 
@@ -182,7 +184,11 @@
     
     //重新设置导航栏，隐藏原生导航栏，手动绘制新的导航栏，使右滑手势跳转时能让导航栏跟着变化
     [self setNavigationBar];
-
+    
+//    EAGLContext *eaglContext = [[EAGLContext alloc]initWithAPI:kEAGLRenderingAPIOpenGLES2];
+//    //NSDictionary *options = [NSDictionary dictionaryWithObject:nil forKey:kCIContextWorkingColorSpace];
+//    self.context = [CIContext contextWithEAGLContext:eaglContext options:nil];
+    
 }
 
 -(void)setNavigationBar
@@ -622,6 +628,18 @@
         
     }
 }
+
+//-(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
+//{
+//    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+//    CIImage *outputImage = [[CIImage alloc]initWithCVPixelBuffer:imageBuffer];
+//    CIFilter *filter = [CIFilter filterWithName:@"CIPhotoEffectMono"];
+//    [filter setValue:outputImage forKey:@"kCIInputImageKey"];
+//    outputImage = filter.outputImage;
+//    
+//    
+//}
+
 
 -(void)enterWeb
 {
