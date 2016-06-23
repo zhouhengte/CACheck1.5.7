@@ -401,7 +401,6 @@
             NSLog(@"分享成功！");
         }
     }];
-
 }
 
 -(void)shareToWeibo:(UIButton *)sender

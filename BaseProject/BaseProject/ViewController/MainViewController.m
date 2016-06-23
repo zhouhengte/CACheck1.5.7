@@ -270,6 +270,8 @@
     [self horiztonImageView];
     [self verticalImageView];
     
+    [self uploadFavor];
+    
     //NSLog(@"%f,%f",kScreenHeight,kScreenWidth);
     //友盟获取测试用设备识别信息的代码
     //    Class cls = NSClassFromString(@"UMANUtil");
@@ -284,8 +286,36 @@
     //
     //    NSLog(@"%@", [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
     
+
+}
+
+-(void)uploadFavor
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //唯一标示idfa
     NSString *identifierForAdvertising = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
-    NSLog(@"identifierForAdvertising:%@",identifierForAdvertising);
+    if ([[userDefaults objectForKey:@"isUploadedFavor"] isEqualToString:@"NO"]){
+        NSArray *favorArray = [userDefaults objectForKey:@"favorArray"];
+        NSString *favorStr = [[NSString alloc]init];
+        for (NSString *favor in favorArray) {
+            favorStr = [favorStr stringByAppendingString:[NSString stringWithFormat:@"%@,",favor]];
+        }
+        favorStr = [favorStr substringToIndex:favorStr.length-1];
+        NSLog(@"favorStr:%@",favorStr);
+        AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+        manager.responseSerializer.acceptableContentTypes = [NSSet setWithObject:@"text/plain"];
+        NSString *url = [NSString stringWithFormat:@"%@/%@",kUrl,kUserFavorUrl];
+        NSDictionary *dic = @{@"idfa":identifierForAdvertising,@"favors":favorStr};
+        NSString *paramStr = [self dictionaryToJson:dic];
+        NSDictionary *paramDic = @{@"json":paramStr};
+        NSLog(@"paramDic:%@",paramDic);
+        [manager POST:url parameters:paramDic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            NSLog(@"upload resonseObject:%@",responseObject);
+            [userDefaults setObject:@"YES" forKey:@"isUploadedFavor"];
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            NSLog(@"uploadFavor error:%@",error);
+        }];
+    }
 }
 
 -(void)getUnreadNewsNum
@@ -547,13 +577,9 @@
 
 - (NSString*)dictionaryToJson:(NSDictionary *)dic
 {
-    
     NSError *parseError = nil;
-    
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
-    
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
 }
 
 

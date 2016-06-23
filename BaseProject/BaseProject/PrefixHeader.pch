@@ -66,10 +66,10 @@ static const int ddLogLevel = DDLogLevelError;
 
 #endif /* PrefixHeader_pch */
 
-#define kUrl @"http://appserver.ciqca.com"
+//#define kUrl @"http://appserver.ciqca.com"
 //#define kUrl @"http://appserver.cieway.com"
 //#define kUrl @"http://10.12.0.215:8088/CAAppServer"//祥兴的测试端口
-//#define kUrl @"http://10.12.0.21:8089"//王乐悠的测试端口
+#define kUrl @"http://10.12.0.21:8089"//王乐悠的测试端口
 
 //appstore链接
 //https://itunes.apple.com/cn/app/yun-jian-jin-kou-shang-pin/id895674234?mt=8
@@ -99,6 +99,8 @@ static const int ddLogLevel = DDLogLevelError;
 #define kHistoryListUrl @"getscanlogapi.action"
 //用户信息修改接口
 #define kInfoUrl @"modifyappuserapi.action"
+//用户喜好提交接口
+#define kUserFavorUrl @"updateUserFavor.action"
 //用户信息反馈
 #define kMessageFeedbackUrl @"feedbackapi.action"
 //欢迎界面

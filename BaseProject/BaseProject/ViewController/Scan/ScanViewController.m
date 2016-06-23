@@ -508,9 +508,13 @@
                 NSString *str = obj.stringValue;
                 //NSLog(@"%@",str);
                 self.barCode = str;
-#pragma mark 如果是十三位的纯数字，则说明是条码
-                if ([self isPureFloat:self.barCode] && self.barCode.length >= 10 && self.barCode.length <= 13)
+#pragma mark 如果是十三位的纯数字，则说明是条码,14位的是zara的条码
+                if ([self isPureFloat:self.barCode] && self.barCode.length >= 10 && self.barCode.length <= 14)
                 {
+                    //zara的条码
+                    if (self.barCode.length == 14) {
+                        self.barCode = [self.barCode substringToIndex:11];
+                    }
                     [self getDataWithString:self.barCode];
 #warning 此处代码方法有问题
                     //                [self postInfoToServer];

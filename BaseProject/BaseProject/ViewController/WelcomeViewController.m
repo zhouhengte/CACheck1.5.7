@@ -25,6 +25,9 @@
 @property(strong,nonatomic)UIImageView *healthImageView;
 @property(strong,nonatomic)UIImageView *homeFurnishingsImageView;
 @property(strong,nonatomic)UIImageView *everydayUseImageView;
+@property(strong,nonatomic)UIButton *confirmButton;
+
+@property(strong,nonatomic)NSMutableArray *favorArray;
 
 
 @end
@@ -34,6 +37,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.favorArray = [NSMutableArray array];
+    
+    
     [self setUpScrollView];
     [self setUpPageControl];
 }
@@ -42,7 +48,18 @@
 {
     [super viewWillAppear:animated];
     [MobClick beginLogPageView:@"欢迎页面"];//("PageOne"为页面名称，可自定义)
+    //[self addObserver:self forKeyPath:@"favorArray" options:NSKeyValueObservingOptionNew context:nil];
 }
+
+//-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+//{
+//    if ([keyPath isEqualToString:@"favorArray"]) {
+//        NSLog(@"change:%@",change);
+//    }else{
+//        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+//    }
+//}
+
 
 
 //-(void)viewDidAppear:(BOOL)animated
@@ -139,10 +156,10 @@
         imageView.frame = iFrame;
         //将图片视图添加到滚动视图中
         [sv addSubview:imageView];
-        if (i == 4) {
-            //向此时的最后一屏图片视图中添加按钮
-            [self addEnterButton:imageView];
-        }
+//        if (i == 4) {
+//            //向此时的最后一屏图片视图中添加按钮
+//            [self addEnterButton:imageView];
+//        }
     }
     
     //设置喜好选择图
@@ -160,8 +177,8 @@
     }];
     self.foodImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"食品"]];
     _foodImageView.tag = 1;
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
-    [_foodImageView addGestureRecognizer:tap];
+    UITapGestureRecognizer *foodTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_foodImageView addGestureRecognizer:foodTap];
     _foodImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_foodImageView];
     [_foodImageView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -181,6 +198,9 @@
     
     self.momAndBabyImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"母婴"]];
     _momAndBabyImageView.tag = 0;
+    UITapGestureRecognizer *momAndBabyTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_momAndBabyImageView addGestureRecognizer:momAndBabyTap];
+    _momAndBabyImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_momAndBabyImageView];
     [_momAndBabyImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(_foodImageView);
@@ -199,6 +219,9 @@
     
     self.wineImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"酒类"]];
     _wineImageView.tag = 2;
+    UITapGestureRecognizer *wineTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_wineImageView addGestureRecognizer:wineTap];
+    _wineImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_wineImageView];
     [_wineImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(_foodImageView);
@@ -217,6 +240,9 @@
     
     self.cosmeticImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"彩妆护肤"]];
     _cosmeticImageView.tag = 3;
+    UITapGestureRecognizer *cosmeticTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_cosmeticImageView addGestureRecognizer:cosmeticTap];
+    _cosmeticImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_cosmeticImageView];
     [_cosmeticImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(_momAndBabyImageView);
@@ -224,7 +250,7 @@
         make.size.mas_equalTo(CGSizeMake(0, 0));
     }];
     UILabel *cosmeticLabel = [[UILabel alloc]init];
-    cosmeticLabel.text = @"酒类";
+    cosmeticLabel.text = @"彩妆护肤";
     cosmeticLabel.textColor = UIColorFromRGB(0xa0a0a0);
     cosmeticLabel.font = [UIFont systemFontOfSize:11];
     [userFavorView addSubview:cosmeticLabel];
@@ -235,6 +261,9 @@
     
     self.homeApplianceImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"家电"]];
     _homeApplianceImageView.tag = 4;
+    UITapGestureRecognizer *homeApplianceTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_homeApplianceImageView addGestureRecognizer:homeApplianceTap];
+    _homeApplianceImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_homeApplianceImageView];
     [_homeApplianceImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(0);
@@ -242,7 +271,7 @@
         make.size.mas_equalTo(CGSizeMake(0, 0));
     }];
     UILabel *homeApplianceLabel = [[UILabel alloc]init];
-    homeApplianceLabel.text = @"彩妆护肤";
+    homeApplianceLabel.text = @"家电";
     homeApplianceLabel.textColor = UIColorFromRGB(0xa0a0a0);
     homeApplianceLabel.font = [UIFont systemFontOfSize:11];
     [userFavorView addSubview:homeApplianceLabel];
@@ -253,6 +282,9 @@
     
     self.digitalImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"数码"]];
     _digitalImageView.tag = 5;
+    UITapGestureRecognizer *digitalTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_digitalImageView addGestureRecognizer:digitalTap];
+    _digitalImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_digitalImageView];
     [_digitalImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(_wineImageView);
@@ -260,7 +292,7 @@
         make.size.mas_equalTo(CGSizeMake(0, 0));
     }];
     UILabel *digitalLabel = [[UILabel alloc]init];
-    digitalLabel.text = @"家电";
+    digitalLabel.text = @"数码";
     digitalLabel.textColor = UIColorFromRGB(0xa0a0a0);
     digitalLabel.font = [UIFont systemFontOfSize:11];
     [userFavorView addSubview:digitalLabel];
@@ -271,6 +303,9 @@
     
     self.healthImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"保健"]];
     _healthImageView.tag = 6;
+    UITapGestureRecognizer *healthTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    [_healthImageView addGestureRecognizer:healthTap];
+    _healthImageView.userInteractionEnabled = YES;
     [userFavorView addSubview:_healthImageView];
     [_healthImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(_cosmeticImageView);
@@ -289,6 +324,9 @@
     
     self.homeFurnishingsImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"家居"]];
     _homeFurnishingsImageView.tag = 7;
+    UITapGestureRecognizer *homeFurnishingsTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    _homeFurnishingsImageView.userInteractionEnabled = YES;
+    [_homeFurnishingsImageView addGestureRecognizer:homeFurnishingsTap];
     [userFavorView addSubview:_homeFurnishingsImageView];
     [_homeFurnishingsImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(0);
@@ -307,6 +345,9 @@
     
     self.everydayUseImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"日用品"]];
     _everydayUseImageView.tag = 8;
+    UITapGestureRecognizer *everydayUseTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(favorTap:)];
+    _everydayUseImageView.userInteractionEnabled = YES;
+    [_everydayUseImageView addGestureRecognizer:everydayUseTap];
     [userFavorView addSubview:_everydayUseImageView];
     [_everydayUseImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(_digitalImageView);
@@ -323,16 +364,17 @@
         make.centerX.mas_equalTo(_everydayUseImageView);
     }];
     
-    UIButton *confirmButton = [[UIButton alloc]init];
-    [confirmButton setTitle:@"确 定" forState:UIControlStateNormal];
-    confirmButton.titleLabel.textColor = [UIColor whiteColor];
-    confirmButton.titleLabel.font = [UIFont systemFontOfSize:15];
-    confirmButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
-    confirmButton.layer.cornerRadius = 4;
-    confirmButton.layer.masksToBounds = YES;
-    [confirmButton addTarget:self action:@selector(confirmClick:) forControlEvents:UIControlEventTouchUpInside];
-    [userFavorView addSubview:confirmButton];
-    [confirmButton mas_makeConstraints:^(MASConstraintMaker *make) {
+    self.confirmButton = [[UIButton alloc]init];
+    [_confirmButton setTitle:@"确 定" forState:UIControlStateNormal];
+    _confirmButton.titleLabel.textColor = [UIColor whiteColor];
+    _confirmButton.titleLabel.font = [UIFont systemFontOfSize:15];
+    _confirmButton.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    _confirmButton.layer.cornerRadius = 4;
+    _confirmButton.layer.masksToBounds = YES;
+    _confirmButton.userInteractionEnabled = NO;
+    [_confirmButton addTarget:self action:@selector(confirmClick:) forControlEvents:UIControlEventTouchUpInside];
+    [userFavorView addSubview:_confirmButton];
+    [_confirmButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(45);
         make.right.mas_equalTo(-45);
         make.bottom.mas_equalTo(-64*kScreenScale);
@@ -355,12 +397,74 @@
 
 -(void)favorTap:(UIGestureRecognizer *)tap
 {
-    NSLog(@"%@",[tap view]);
+    if ([[tap view]viewWithTag:101]) {
+        [self.favorArray removeObject:[NSString stringWithFormat: @"%ld",[tap view].tag]];
+        [[[tap view]viewWithTag:101] removeFromSuperview];
+    }else{
+        [self.favorArray addObject:[NSString stringWithFormat: @"%ld",[tap view].tag]];
+        UIImageView *selectedImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"喜好已勾选"]];
+        selectedImageView.tag = 101;
+        [[tap view] addSubview:selectedImageView];
+        [selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.right.top.mas_equalTo(0);
+            make.size.mas_equalTo(CGSizeMake(21, 21));
+        }];
+    }
+    NSLog(@"favorArray:%@",_favorArray);
+    if (_favorArray.count == 0) {
+        _confirmButton.userInteractionEnabled = NO;
+        _confirmButton.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    }else{
+        _confirmButton.userInteractionEnabled = YES;
+        _confirmButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
+    }
 }
 
 -(void)confirmClick:(UIButton *)sender
 {
-    NSLog(@"确定");
+    NSString *favor = [[NSString alloc]init];
+    NSMutableArray *favorWordArray = [NSMutableArray array];
+    for (NSString *str in _favorArray) {
+        switch ([str integerValue]) {
+            case 0:
+                favor = @"母婴";
+                break;
+            case 1:
+                favor = @"食品";
+                break;
+            case 2:
+                favor = @"酒类";
+                break;
+            case 3:
+                favor = @"彩妆护肤";
+                break;
+            case 4:
+                favor = @"家电";
+                break;
+            case 5:
+                favor = @"数码";
+                break;
+            case 6:
+                favor = @"保健";
+                break;
+            case 7:
+                favor = @"家居";
+                break;
+            case 8:
+                favor = @"日用品";
+                break;
+                
+            default:
+                break;
+        }
+        [favorWordArray addObject:favor];
+    }
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:favorWordArray forKey:@"favorArray"];
+    [userDefaults setObject:@"NO" forKey:@"isUploadedFavor"];
+    [userDefaults synchronize];
+    [self enterApp];
+    //NSLog(@"favorWordArray:%@",favorWordArray);
 }
 
 //向图片视图中添加按钮
