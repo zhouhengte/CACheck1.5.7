@@ -170,7 +170,11 @@
         make.top.mas_equalTo(width/2.0 + 284);
     }];
     
-    
+    UIImageView *filterImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"滤镜"]];
+    [self.view addSubview:filterImageView];
+    [filterImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.right.bottom.mas_equalTo(0);
+    }];
     
 //    _imageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"QrcodeBoard"]];
 //    [self.view addSubview:self.imageView];
@@ -675,7 +679,7 @@
     
     NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
     
-    [dateformatter setDateFormat:@"YYYY-MM-dd HH:mm"];
+    [dateformatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
     
     NSString *  locationString=[dateformatter stringFromDate:senddate];
     

@@ -32,7 +32,7 @@
     self.thirdType = [[NSUserDefaults standardUserDefaults]objectForKey:@"thirdtype"];
     [self setNavigationBar];
     
-    if (self.thirdType) {
+    if (self.thirdType || self.isUpdatePassword) {
         [self setThirdLoginInterface];
     }else{
         [self setInterface];
@@ -104,7 +104,7 @@
         make.size.mas_equalTo(CGSizeMake(11, 19));
     }];
     
-    if (!self.thirdType) {
+    if (!self.thirdType && !self.isUpdatePassword) {
         UIButton *rightButton = [[UIButton alloc]init];
         [rightButton setTitle:@"提交" forState:UIControlStateNormal];
         [rightButton addTarget:self action:@selector(rightItemAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -436,7 +436,12 @@
     }else{
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         NSString *userName = [userDefaults objectForKey:@"username"];
-        NSDictionary *dic = @{@"username":userName,@"phone":self.phoneNumTextField.text,@"openid":@"1"};
+        NSDictionary *dic = [NSDictionary dictionary];
+        if (self.isUpdatePassword) {
+            dic = @{@"phone":self.phoneNumTextField.text,@"changepsw":@"1"};
+        }else{
+            dic = @{@"username":userName,@"phone":self.phoneNumTextField.text,@"openid":@"1"};
+        }
         NSString *strParam = [self dictionaryToJson:dic];
         NSDictionary *paramDic = @{@"json":strParam};
         
@@ -455,6 +460,13 @@
             }
             if ([responseObject[@"Result"] integerValue] != 0) {
                 //self.string = responseObject[@"FailInfo"];
+                if ([responseObject[@"FailInfo"] isEqualToString:@"数据不存在"]) {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"该手机号未注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                    [alert  show];
+                    sender.userInteractionEnabled = YES;
+                    return;
+
+                }
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:responseObject[@"FailInfo"] delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
                 [alert  show];
                 sender.userInteractionEnabled = YES;
@@ -501,7 +513,13 @@
             [manager.requestSerializer setValue:token forHTTPHeaderField:@"CA-Token"];
             manager.responseSerializer.acceptableContentTypes = [NSSet setWithObject:@"text/plain"];
             NSString *url = [NSString stringWithFormat:@"%@/%@",kUrl,kUpdateThirdPasswordUrl];
-            NSDictionary *dic = @{@"username":userName,@"thirdparty":thirdParty,@"checkcode":_verificationTextField.text,@"userpassword":[_freshPasswordTextField.text MD5]};
+            NSDictionary *dic = [NSDictionary dictionary];
+            if (self.isUpdatePassword) {
+                dic = @{@"username":self.phoneNumTextField.text,@"checkcode":_verificationTextField.text,@"userpassword":[_freshPasswordTextField.text MD5]};
+            }else{
+                dic = @{@"username":userName,@"thirdparty":thirdParty,@"checkcode":_verificationTextField.text,@"userpassword":[_freshPasswordTextField.text MD5]};
+            }
+            
             NSString *paramStr = [self dictionaryToJson:dic];
             NSDictionary *paramDic = @{@"json":paramStr};
             NSLog(@"paramDic:%@",paramDic);

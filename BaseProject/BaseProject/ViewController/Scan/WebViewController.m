@@ -83,7 +83,7 @@
     
     UIButton *button = [[UIButton alloc]init];
     [button setTitle:@"返回" forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(backToRecoreDetailViewController) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:self action:@selector(backToRecoreDetailViewController:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button];
     [button mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(5);
@@ -119,9 +119,14 @@
     button.alpha = 1;
 }
 
--(void)backToRecoreDetailViewController
+-(void)backToRecoreDetailViewController:(UIButton *)sender
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    if ([self.webView canGoBack]) {
+        sender.alpha = 1.0;
+        [self.webView goBack];
+    }else{
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 

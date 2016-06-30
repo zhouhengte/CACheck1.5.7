@@ -195,6 +195,14 @@
     if (self.tableView.isEditing) {
         [sender setTitle:@"取消" forState:UIControlStateNormal];
         
+        //修改选取框
+//        for (int row=0; row<self.dataArray.count; row++) {
+//            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+//            RecordTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//            UIImageView *imageView = cell.subviews[2].subviews[0];
+//            imageView.image = [UIImage imageNamed:@"未勾选"];
+//        }
+        
         self.deleteView = [[UIView alloc]init];
         [self.view addSubview:_deleteView];
         [_deleteView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -288,6 +296,11 @@
         for (int row=0; row<self.dataArray.count; row++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
             [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+            //修改选取框
+            RecordTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+            UIImageView *imageView = cell.subviews[3].subviews[0];
+            imageView.image = [UIImage imageNamed:@"已勾选"];
+
             [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
             [_deleteArray addObject:[self.timeArray objectAtIndex:indexPath.row]];
             [_deleteIndexPathArray addObject:indexPath];
@@ -298,6 +311,10 @@
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
             [_tableView deselectRowAtIndexPath:indexPath animated:NO];
             [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
+            //修改选取框
+//            RecordTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//            UIImageView *imageView = cell.subviews[2].subviews[0];
+//            imageView.image = [UIImage imageNamed:@"未勾选"];
         }
         [_deleteArray removeAllObjects];
         [_deleteIndexPathArray removeAllObjects];
@@ -373,6 +390,7 @@
         [messageArray writeToFile:duedatePlistPath atomically:YES];
         
         [_deleteArray removeAllObjects];
+        [self cancelClick];
         
     }], nil]show];
 }
@@ -553,7 +571,7 @@
 
 #pragma mark - Table view data source
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.dataArray.count;
+    return self.timeArray.count;
 }
 
 
@@ -624,8 +642,13 @@
             imageUrl = model.value;
             //            continue;
         }
-        
-        cell.dateLabel.text = self.timeArray[indexPath.row];
+//        NSLog(@"dataArray:%@",_dataArray);
+//        NSLog(@"timeArray:%@",_timeArray);
+        if ([self.timeArray[indexPath.row] length] == 19){
+            cell.dateLabel.text = [self.timeArray[indexPath.row] substringToIndex:16];
+        }else{
+            cell.dateLabel.text = self.timeArray[indexPath.row];
+        }
     }if (cell.stateLabel.text == nil) {//循环外判断如果statelabel为空的话，datelabel取代其位置
         //如果状态栏为空则改变frame
         
@@ -691,6 +714,10 @@
         recordDetailVC.onlyStr = @"记录列表";
         [self.navigationController pushViewController:recordDetailVC animated:YES];
     }else{
+        //获取选取图
+        RecordTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        UIImageView *imageView = cell.subviews[3].subviews[0];
+        imageView.image = [UIImage imageNamed:@"已勾选"];
         [_deleteArray addObject:[self.dataArray objectAtIndex:indexPath.row]];
         [_deleteArray addObject:[self.timeArray objectAtIndex:indexPath.row]];
         [_deleteIndexPathArray addObject:indexPath];
@@ -720,6 +747,11 @@
         [_deleteArray removeObject:[self.dataArray objectAtIndex:indexPath.row]];
         [_deleteArray removeObject:[self.timeArray objectAtIndex:indexPath.row]];
         [_deleteIndexPathArray removeObject:indexPath];
+        //修改选取框
+//        RecordTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//        UIImageView *imageView = cell.subviews[2].subviews[0];
+//        imageView.image = [UIImage imageNamed:@"未勾选"];
+
     }
 }
 

@@ -10,4 +10,6 @@
 
 @interface PasswordViewController : ViewController
 
+@property (nonatomic,assign) BOOL isUpdatePassword;
+
 @end

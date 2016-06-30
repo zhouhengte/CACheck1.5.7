@@ -83,6 +83,8 @@
 @property (nonatomic , strong) UIButton *leftStatusButton;
 @property (nonatomic , assign) NSUInteger statusLength;
 
+
+
 @end
 
 @implementation RecordDetailViewController
@@ -150,6 +152,8 @@
     self.tableView.dataSource = self;
     self.tableView.alwaysBounceVertical = YES;
     self.tableView.bounces = NO;
+    
+
 
 //    UIView *footView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight)];
 //    footView.backgroundColor = [UIColor groupTableViewBackgroundColor];
@@ -158,12 +162,15 @@
     
     [self.view addSubview:self.tableView];
     
-    
-    
     self.automaticallyAdjustsScrollViewInsets = NO;
+    
     //表头视图，上方大图
     self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 287/586.0*kScreenHeight)];
-    
+    //表头阴影
+    UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
+    UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
+    imageViewBg.image = imageBg;
+    [self.tableView.tableHeaderView addSubview:imageViewBg];
     self.tableView.tableHeaderView.backgroundColor = [UIColor whiteColor];
     
     
@@ -180,7 +187,8 @@
         [self getDataUrl];
     }
     
-
+    //添加检验状态便条
+    //[self addNote];
     
     
     
@@ -523,7 +531,7 @@
             self.isSettedDueDateView.commentBlock = ^(){
                 [weakSelf goToCommentViewController];
             };
-            break;
+            break;//只用读取第一条的就够了
         };
     }
     
@@ -893,7 +901,7 @@
     NSTimeInterval timeInterval = [date timeIntervalSinceDate:now];
     int remainingDays = ((int)timeInterval)/(3600*24)+1;
     if (remainingDays <= 0) {
-        self.fireDate = [NSDate date];
+        duedateFireDate = [NSDate date];
     }else if (remainingDays == 1){
         duedateFireDate = [NSDate dateWithTimeInterval:32400 sinceDate:date];//过期日9点
     }else if (remainingDays <= 11) {
@@ -974,22 +982,22 @@
     //NSLog(@"array:%@",array);
     
     //如果不存在， 把dic添加到  array中去
-    if (!isExitStr) {
-        if (self.fireDate) {
-            self.fireDate = [self checkFireDate:self.fireDate withArray:array];
-            [dic setValue:self.fireDate forKey:@"firedate"];
-            [array insertObject:dic atIndex:0];
-        }
-        eightDayFireDate = [self checkFireDate:eightDayFireDate withArray:array];
-        [eightDayDic setValue:eightDayFireDate forKey:@"firedate"];
-        [array insertObject:eightDayDic atIndex:0];
-        if (duedateFireDate) {
-            duedateFireDate = [self checkFireDate:duedateFireDate withArray:array];
-            [duedateDic setValue:duedateFireDate forKey:@"firedate"];
-            [array insertObject:duedateDic atIndex:0];
-        }
-        //NSLog(@"array:%@",array);
-    }
+//    if (!isExitStr) {
+//        if (self.fireDate) {
+//            self.fireDate = [self checkFireDate:self.fireDate withArray:array];
+//            [dic setValue:self.fireDate forKey:@"firedate"];
+//            [array insertObject:dic atIndex:0];
+//        }
+//        eightDayFireDate = [self checkFireDate:eightDayFireDate withArray:array];
+//        [eightDayDic setValue:eightDayFireDate forKey:@"firedate"];
+//        [array insertObject:eightDayDic atIndex:0];
+//        if (duedateFireDate) {
+//            duedateFireDate = [self checkFireDate:duedateFireDate withArray:array];
+//            [duedateDic setValue:duedateFireDate forKey:@"firedate"];
+//            [array insertObject:duedateDic atIndex:0];
+//        }
+//        //NSLog(@"array:%@",array);
+//    }
     
     
     //如果推送纪录超过100，删除最后一条
@@ -1031,7 +1039,7 @@
     // 设置重复的间隔
     //notification.repeatInterval = kCFCalendarUnitMinute;
     // 通知内容
-    eightDayNotification.alertBody =  [NSString stringWithFormat:@"您的商品“%@“已使用7天了，去评价一下吧～",self.productName];
+    eightDayNotification.alertBody =  [NSString stringWithFormat:@"“%@“这件商品怎么样，去评价一下吧～",self.productName];
     eightDayNotification.applicationIconBadgeNumber = 1;
     // 通知被触发时播放的声音
     eightDayNotification.soundName = UILocalNotificationDefaultSoundName;
@@ -1229,8 +1237,14 @@
         self.onlyStr = nil;
     }
     
-    
-    [UIView animateKeyframesWithDuration:1 delay:0.2 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+    [self performSelector:@selector(notePush) withObject:nil afterDelay:0];
+
+}
+
+-(void)notePush
+{
+    //便条动画
+    [UIView animateKeyframesWithDuration:0.7 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.9 animations:^{
             [self.tableView.tableHeaderView bringSubviewToFront:_statusDescButton];
             [self.tableView.tableHeaderView bringSubviewToFront:_leftStatusButton];
@@ -1250,27 +1264,6 @@
     } completion:^(BOOL finished) {
         
     }];
-    
-//    [UIView animateKeyframesWithDuration:3 delay:1 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-//        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.9 animations:^{
-//            [_scrollView bringSubviewToFront:_statusDescButton];
-//            [_scrollView bringSubviewToFront:_leftStatusButton];
-//            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
-//                make.width.mas_equalTo(90);
-//            }];
-//            [_statusDescButton setNeedsLayout];
-//            [_statusDescButton layoutIfNeeded];
-//        }];
-//        [UIView addKeyframeWithRelativeStartTime:0.9 relativeDuration:0.1 animations:^{
-//            [_statusDescButton mas_updateConstraints:^(MASConstraintMaker *make) {
-//                make.width.mas_equalTo(80);
-//            }];
-//            [_statusDescButton setNeedsLayout];
-//            [_statusDescButton layoutIfNeeded];
-//        }];
-//    } completion:^(BOOL finished) {
-//        
-//    }];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -1385,7 +1378,8 @@
         [self getBarCodeComment];
     }
 
-    
+    //获取检验状态便条
+    [self addNote];
     
     NSArray * a = [self.wantDic objectForKey:@"ProductInfo"];
     for (NSDictionary *dict in a) {
@@ -1536,7 +1530,7 @@
     
     [manager POST:self.requestUrl parameters:self.paramDic progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject)
     {
-        NSLog(@"responseObject:%@",responseObject);
+        //NSLog(@"responseObject:%@",responseObject);
         if ([responseObject[@"Result"]integerValue] !=0 ) {
             return ;
         }
@@ -1575,6 +1569,9 @@
         }else {
             [self getLocalPicLoop];
         }
+        
+        [self addNote];
+        //[self performSelector:@selector(notePush) withObject:nil afterDelay:0.3];
         
         NSFileManager *fm = [NSFileManager defaultManager];
         //找到documents文件所在的路径
@@ -1657,6 +1654,7 @@
 #warning 将数据存入plist
         [array writeToFile:plistPath atomically:YES];
         [dateArray writeToFile:datePlistPath atomically:YES];
+        [userDefaults synchronize];
         
         
         NSArray * arrayFromfile = [NSArray arrayWithContentsOfFile:plistPath];
@@ -2269,9 +2267,20 @@
             //NSString *imageUrl = [NSString stringWithFormat:@"http://bjtest.ciqca.com/getPhotoList.action?typeid=69377067691&prefix=product&picindex=%d",i];
             NSString *imageUrl = self.picArray[i];
             NSURL *url = [NSURL URLWithString:imageUrl];
+            NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
             //创建一个图片视图对象
             UIImageView *imageView = [[UIImageView alloc]init];
             [imageView setImageWithURL:url];
+//            __weak UIImageView *weakImageView = imageView;
+//            [imageView setImageWithURLRequest:urlRequest placeholderImage:nil success:^(NSURLRequest * _Nonnull request, NSHTTPURLResponse * _Nullable response, UIImage * _Nonnull image) {
+//                weakImageView.image = image;
+//                [self.tableView.tableHeaderView bringSubviewToFront:_statusDescButton];
+//                [self.tableView.tableHeaderView bringSubviewToFront:_leftStatusButton];
+//                
+//            } failure:^(NSURLRequest * _Nonnull request, NSHTTPURLResponse * _Nullable response, NSError * _Nonnull error) {
+//                
+//            }];
+
             //设置图片视图的位置及大小
             //声明了一个结构体的变量，其中x和y和w和h初始化为0
             CGRect iFrame = CGRectZero;
@@ -2299,12 +2308,13 @@
         //配置滚动视图不显示水平滚动条提示
         self.scrollView.showsHorizontalScrollIndicator = NO;
         [self.tableView.tableHeaderView addSubview:self.scrollView];
+        [self.tableView.tableHeaderView sendSubviewToBack:_scrollView];
         
         //设置下方阴影
-        UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
-        UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
-        imageViewBg.image = imageBg;
-        [self.tableView.tableHeaderView addSubview:imageViewBg];
+//        UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
+//        UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
+//        imageViewBg.image = imageBg;
+//        [self.tableView.tableHeaderView addSubview:imageViewBg];
         
         //添加检验状态便条
         [self addNote];
@@ -2346,7 +2356,8 @@
 {
     NSLog(@"点击了检验状态");
     WebViewController *webVC = [[WebViewController alloc] init];
-    webVC.url = @"http://appserver.ciqca.com/appweb/valid.jsp";
+    NSString *urlStr = [NSString stringWithFormat:@"%@/appweb/valid.jsp",kUrl];
+    webVC.url = urlStr;
     webVC.titleStr = @"已认证";
     [self.navigationController pushViewController:webVC animated:YES];
 }
@@ -2394,19 +2405,20 @@
     imageView.image = aImage;
     self.tableView.tableHeaderView.backgroundColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
     
-    UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
-    UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
-    imageViewBg.image = imageBg;
-    [self.tableView.tableHeaderView addSubview:imageViewBg];
+//    UIImageView *imageViewBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 219/586.0*kScreenHeight, [UIScreen mainScreen].bounds.size.width, 68/586.0*kScreenHeight)];
+//    UIImage *imageBg = [UIImage imageNamed:@"图片上阴影"];
+//    imageViewBg.image = imageBg;
+//    [self.tableView.tableHeaderView addSubview:imageViewBg];
     
     [self.tableView.tableHeaderView addSubview:imageView];
     
     //添加检验状态便条
-    [self addNote];
+    //[self addNote];
     
     
 }
 
+//添加检验状态便条
 -(void)addNote
 {
     NSArray * baseInfoArray = [self.wantDic objectForKey:@"BaseInfo"];
@@ -2417,14 +2429,15 @@
             self.statusDescButton = [[UIButton alloc]init];
             _statusDescButton.backgroundColor = [UIColor whiteColor];
             [_statusDescButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
-            [self.tableView.tableHeaderView addSubview:_statusDescButton];
+            [self.tableView addSubview:_statusDescButton];
             _statusDescButton.layer.masksToBounds = YES;
             _statusDescButton.layer.borderWidth = 0.5;
             _statusDescButton.layer.borderColor = [UIColor whiteColor].CGColor;
             _statusDescButton.layer.cornerRadius = 11.5;
             [_statusDescButton mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.mas_equalTo(20);
-                make.bottom.mas_equalTo(-24.5);
+                make.top.mas_equalTo(287/586.0*kScreenHeight-47.5);
+                //make.bottom.mas_equalTo(-24.5);
                 make.size.mas_equalTo(CGSizeMake(23, 23));
             }];
             
@@ -2467,10 +2480,11 @@
                 [_leftStatusButton setImage:[UIImage imageNamed:@"放行"] forState:UIControlStateNormal];
             }
             [_leftStatusButton addTarget:self action:@selector(statusDescClick:) forControlEvents:UIControlEventTouchUpInside];
-            [self.tableView.tableHeaderView addSubview:_leftStatusButton];
+            [self.tableView addSubview:_leftStatusButton];
             [_leftStatusButton mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.mas_equalTo(20);
-                make.bottom.mas_equalTo(-20);
+                //make.bottom.mas_equalTo(-20);
+                make.top.mas_equalTo(287/586.0*kScreenHeight-51.5);
                 make.size.mas_equalTo(CGSizeMake(32, 32));
             }];
             
@@ -2501,6 +2515,13 @@
         return 0;
     }
     
+    //如果没有报检信息
+    if (self.productInfoArray.count == 1){
+        if (section == 3) {
+            return 0;
+        }
+    }
+    
     if (section == 3) {
 //        if (self.barCode != nil) {
 //            return 0;
@@ -2527,7 +2548,7 @@
         }
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
-            return self.titleSize.height+10;
+            return self.titleSize.height+30;
             
         }else{
             return 35;
@@ -2557,7 +2578,7 @@
     }
     if (indexPath.section == 0) {//标题
         if (indexPath.row == 0) {
-            return self.titleSize.height+10;
+            return self.titleSize.height+30;
             
         }else{
             return 35;
@@ -2929,18 +2950,14 @@
         
     }
     else if (indexPath.section == 3){
-        
         //NSLog(@"点击l第三个section");
         cell.selectionStyle =UITableViewCellSelectionStyleNone;
-        
     }
-    
     else{
         //if (self.codeStr != nil) {
             webVC.titleStr = cell.titleLabel.text;
             [self.navigationController pushViewController:webVC animated:YES];
         //}
-
     }
     
     

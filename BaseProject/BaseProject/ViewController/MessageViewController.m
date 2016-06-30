@@ -66,9 +66,11 @@
     //根据发送时间排序
     NSArray *sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"firedate" ascending:NO]];
     [self.messageArray sortUsingDescriptors:sortDescriptors];
+    //NSLog(@"messageArray:%@",_messageArray);
     
     NSMutableArray *mutableArray = [NSMutableArray arrayWithArray:self.messageArray];
     NSDate *now = [NSDate date];
+    
     //如果还没到该消息发送的时间，则隐藏该消息
     for (NSDictionary *innerDic in mutableArray) {
         NSDate *firedate = innerDic[@"firedate"];
@@ -76,6 +78,8 @@
             [self.messageArray removeObject:innerDic];
         }
     }
+    
+    
     //如果商品重复，隐藏一条，现在不需要隐藏
 //    NSMutableArray *listArray = [NSMutableArray array];
 //    for (NSDictionary *innerDic in _messageArray) {
@@ -196,6 +200,16 @@
     [self.tableView setEditing:!self.tableView.isEditing animated:YES];
     // 判断表视图的状态,决定导航按钮上显示的文字
     if (self.tableView.isEditing) {
+        
+//        for (int row=0; row<self.messageArray.count; row++) {
+//            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+//            MessageTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//            UIImageView *imageView = cell.subviews[2].subviews[0];
+//            imageView.image = [UIImage imageNamed:@"未勾选"];
+//        }
+        
+        
+        
         [sender setTitle:@"取消" forState:UIControlStateNormal];
         
         self.deleteView = [[UIView alloc]init];
@@ -317,6 +331,7 @@
         [array writeToFile:plistPath atomically:YES];
         
         [_deleteArray removeAllObjects];
+        [self cancelClick];
 
     }], nil]show];
 }
@@ -329,6 +344,9 @@
         for (int row=0; row<self.messageArray.count; row++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
             [_tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+            MessageTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+            UIImageView *imageView = cell.subviews[3].subviews[0];
+            imageView.image = [UIImage imageNamed:@"已勾选"];
             [_deleteArray addObject:[self.messageArray objectAtIndex:indexPath.row]];
             [_deleteIndexPathArray addObject:indexPath];
         }
@@ -337,6 +355,10 @@
         for (int row=0; row<self.messageArray.count; row++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
             [_tableView deselectRowAtIndexPath:indexPath animated:NO];
+//            MessageTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//            UIImageView *imageView = cell.subviews[2].subviews[0];
+//            imageView.image = [UIImage imageNamed:@"未勾选"];
+
         }
         [_deleteArray removeAllObjects];
         [_deleteIndexPathArray removeAllObjects];
@@ -368,6 +390,7 @@
     cell.messageDic = self.messageArray[indexPath.row];
 //    if ([tableView isEditing]) {
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+//    cell.editingAccessoryType = UITableViewCellAccessoryCheckmark;
 //    }else{
 //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
 //    }
@@ -377,16 +400,21 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"1");
     //UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     if (![self.tableView isEditing]) {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        RecordDetailViewController *recordDetailVC = [[RecordDetailViewController alloc] init];
+        UIStoryboard *mainStoryBoard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        RecordDetailViewController *recordDetailVC = [mainStoryBoard instantiateViewControllerWithIdentifier:@"recordDetailViewController"];
         recordDetailVC.judgeStr = self.messageArray[indexPath.row][@"barcode"];
         recordDetailVC.sugueStr = @"list";
         recordDetailVC.onlyStr = @"消息";
         [self.navigationController pushViewController:recordDetailVC animated:YES];
     }else{
+        //获取选取图
+        MessageTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        UIImageView *imageView = cell.subviews[3].subviews[0];
+        imageView.image = [UIImage imageNamed:@"已勾选"];
+        
         [_deleteArray addObject:[self.messageArray objectAtIndex:indexPath.row]];
         [_deleteIndexPathArray addObject:indexPath];
     }
@@ -394,10 +422,13 @@
 
 -(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"2");
     if ([self.tableView isEditing]) {
         [_deleteArray removeObject:[self.messageArray objectAtIndex:indexPath.row]];
         [_deleteIndexPathArray removeObject:indexPath];
+//        MessageTableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//        UIImageView *imageView = cell.subviews[2].subviews[0];
+//        imageView.image = [UIImage imageNamed:@"未勾选"];
+
     }
 }
 
@@ -412,7 +443,9 @@
 //问2:该行的编辑样式
 -(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
+//    MessageTableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
+//    NSLog(@"subView:%@",cell.subviews);
+//    NSLog(@"2subView:%@",cell.subviews[3].subviews);
 //        return UITableViewCellEditingStyleDelete;
 //
 //        return UITableViewCellEditingStyleInsert;
@@ -427,6 +460,7 @@
 //参数:editingStyle就是点击的那个按钮的样式
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         //  删除功能
         // 1.先删除数组中的数据

@@ -35,11 +35,21 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     self.favorArray = [NSMutableArray array];
+    self.view.tag = 10;
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *favorNumArray = [userDefaults objectForKey:@"favorNumArray"];
+    NSLog(@"favorArray:%@",favorNumArray);
     
     //设置喜好选择图
     UILabel *titleLabel = [[UILabel alloc]init];
+    titleLabel.tag = 11;
     titleLabel.text = @"选择你感兴趣的进口商品";
-    titleLabel.font = [UIFont systemFontOfSize:25];
+    if ([[UIDevice currentDevice].systemVersion doubleValue] >= 9.0){
+        titleLabel.font = [UIFont fontWithName:@"PingFangSC-Thin" size:25];
+    }else{
+        titleLabel.font = [UIFont systemFontOfSize:25];
+    }
     [self.view addSubview:titleLabel];
     [titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(0);
@@ -58,6 +68,7 @@
     }];
     UILabel *foodLabel = [[UILabel alloc]init];
     foodLabel.text = @"食品";
+    foodLabel.tag = 12;
     foodLabel.textColor = UIColorFromRGB(0xa0a0a0);
     foodLabel.font = [UIFont systemFontOfSize:11];
     [self.view addSubview:foodLabel];
@@ -79,6 +90,7 @@
     }];
     UILabel *momAndBabyLabel = [[UILabel alloc]init];
     momAndBabyLabel.text = @"母婴";
+    momAndBabyLabel.tag = 13;
     momAndBabyLabel.textColor = UIColorFromRGB(0xa0a0a0);
     momAndBabyLabel.font = [UIFont systemFontOfSize:11];
     [self.view addSubview:momAndBabyLabel];
@@ -238,18 +250,34 @@
     [_confirmButton setTitle:@"确 定" forState:UIControlStateNormal];
     _confirmButton.titleLabel.textColor = [UIColor whiteColor];
     _confirmButton.titleLabel.font = [UIFont systemFontOfSize:15];
-    _confirmButton.backgroundColor = UIColorFromRGB(0xd3d3d3);
+    _confirmButton.backgroundColor = [UIColor colorWithRed:52/255.0 green:181/255.0 blue:254/255.0 alpha:1.0];
     _confirmButton.layer.cornerRadius = 4;
     _confirmButton.layer.masksToBounds = YES;
-    _confirmButton.userInteractionEnabled = NO;
+    _confirmButton.userInteractionEnabled = YES;
     [_confirmButton addTarget:self action:@selector(confirmClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_confirmButton];
     [_confirmButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(45);
-        make.right.mas_equalTo(-45);
+        make.left.mas_equalTo(45*kScreenWidthScale);
+        make.right.mas_equalTo(-45*kScreenWidthScale);
         make.bottom.mas_equalTo(-64*kScreenScale);
         make.height.mas_equalTo(44*kScreenScale);
     }];
+    
+    
+    for (NSString *favorNum in favorNumArray) {
+        //[self.view viewWithTag:[favorNum integerValue]];
+        [self.favorArray addObject:[NSString stringWithFormat: @"%ld",[favorNum integerValue]]];
+        UIImageView *selectedImageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"喜好已勾选"]];
+        selectedImageView.tag = 101;
+        [[self.view viewWithTag:[favorNum integerValue]] addSubview:selectedImageView];
+        [selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.right.top.mas_equalTo(0);
+//            make.right.mas_equalTo([self.view viewWithTag:[favorNum integerValue]].center).mas_equalTo(31);
+//            make.top.mas_equalTo([self.view viewWithTag:[favorNum integerValue]].center).mas_equalTo(-31);
+            make.size.mas_equalTo([self.view viewWithTag:[favorNum integerValue]]).multipliedBy(21/62.0);
+        }];
+
+    }
 
 }
 
@@ -265,7 +293,7 @@
         [[tap view] addSubview:selectedImageView];
         [selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.right.top.mas_equalTo(0);
-            make.size.mas_equalTo(CGSizeMake(21, 21));
+            make.size.mas_equalTo([tap view]).multipliedBy(21/62.0);
         }];
     }
     NSLog(@"favorArray:%@",_favorArray);
@@ -319,6 +347,7 @@
     }
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:favorWordArray forKey:@"favorArray"];
+    [userDefaults setObject:_favorArray forKey:@"favorNumArray"];
     [userDefaults setObject:@"NO" forKey:@"isUploadedFavor"];
     [userDefaults synchronize];
     [self uploadFavor];
@@ -379,7 +408,7 @@
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [UIView animateKeyframesWithDuration:2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+    [UIView animateKeyframesWithDuration:1 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0 animations:^{
             [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.size.mas_equalTo(CGSizeMake(0, 0));

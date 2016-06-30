@@ -21,7 +21,11 @@
 
 -(void)setCommentDic:(NSDictionary *)commentDic{
     self.commentLabel.text = [commentDic objectForKey:@"ccomment"];
-    self.useridLabel.text = [[commentDic objectForKey:@"username"] stringByReplacingCharactersInRange:NSMakeRange(3, 4) withString:@"****"];
+    if (![[commentDic objectForKey:@"uname"] isEqualToString:@""]) {
+        self.useridLabel.text = [commentDic objectForKey:@"uname"];
+    }else{
+        self.useridLabel.text = [[commentDic objectForKey:@"username"] stringByReplacingCharactersInRange:NSMakeRange(3, 4) withString:@"****"];
+    }
     self.dateLabel.text = [[commentDic objectForKey:@"createtime"] substringToIndex:10];
     
     CAShapeLayer *maskLayer = [CAShapeLayer layer];

@@ -11,6 +11,7 @@
 #import "MainViewController.h"
 #import <UMSocial.h>
 #import "ThirdTelVerificationViewController.h"
+#import "PasswordViewController.h"
 
 #define kScreenScale (self.view.bounds.size.height/568.0)
 #define kScreenWidthScale (self.view.bounds.size.width/320.0)
@@ -361,6 +362,9 @@
 -(void)forgotPasswordClick:(UIButton *)sender
 {
     NSLog(@"忘记密码");
+    PasswordViewController *passwordVC = [[PasswordViewController alloc]init];
+    passwordVC.isUpdatePassword = YES;
+    [self.navigationController pushViewController:passwordVC animated:YES];
 }
 
 - (void)sinaLoginClick:(UIButton *)sender {

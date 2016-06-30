@@ -28,7 +28,7 @@
 @property(strong,nonatomic)UIButton *confirmButton;
 
 @property(strong,nonatomic)NSMutableArray *favorArray;
-
+@property(assign,nonatomic)BOOL isPlayed;
 
 @end
 
@@ -38,7 +38,7 @@
     [super viewDidLoad];
     
     self.favorArray = [NSMutableArray array];
-    
+    self.isPlayed = NO;
     
     [self setUpScrollView];
     [self setUpPageControl];
@@ -164,12 +164,18 @@
     
     //设置喜好选择图
     UIView *userFavorView = [[UIView alloc]init];
-    userFavorView.userInteractionEnabled = YES;
+    //userFavorView.userInteractionEnabled = YES;
     userFavorView.frame = CGRectMake(5*sv.bounds.size.width, 0, sv.bounds.size.width, sv.bounds.size.height);
     [sv addSubview:userFavorView];
     UILabel *titleLabel = [[UILabel alloc]init];
     titleLabel.text = @"选择你感兴趣的进口商品";
-    titleLabel.font = [UIFont systemFontOfSize:25];
+    //titleLabel.font = [UIFont fontWithName:@"AppleSDGothicNeo-Thin" size:25];
+    //titleLabel.font = [UIFont systemFontOfSize:25];
+    if ([[UIDevice currentDevice].systemVersion doubleValue] >= 9.0){
+        titleLabel.font = [UIFont fontWithName:@"PingFangSC-Thin" size:25];
+    }else{
+        titleLabel.font = [UIFont systemFontOfSize:25];
+    }
     [userFavorView addSubview:titleLabel];
     [titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.mas_equalTo(0);
@@ -375,9 +381,9 @@
     [_confirmButton addTarget:self action:@selector(confirmClick:) forControlEvents:UIControlEventTouchUpInside];
     [userFavorView addSubview:_confirmButton];
     [_confirmButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(45);
-        make.right.mas_equalTo(-45);
-        make.bottom.mas_equalTo(-64*kScreenScale);
+        make.left.mas_equalTo(45*kScreenWidthScale);
+        make.right.mas_equalTo(-45*kScreenWidthScale);
+        make.bottom.mas_equalTo(-74*kScreenScale);
         make.height.mas_equalTo(44*kScreenScale);
     }];
     
@@ -407,8 +413,10 @@
         [[tap view] addSubview:selectedImageView];
         [selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.right.top.mas_equalTo(0);
-            make.size.mas_equalTo(CGSizeMake(21, 21));
+            make.size.mas_equalTo([tap view]).multipliedBy(21/62.0);
+            
         }];
+        [selectedImageView layoutIfNeeded];
     }
     NSLog(@"favorArray:%@",_favorArray);
     if (_favorArray.count == 0) {
@@ -461,6 +469,7 @@
     }
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:favorWordArray forKey:@"favorArray"];
+    [userDefaults setObject:_favorArray forKey:@"favorNumArray"];
     [userDefaults setObject:@"NO" forKey:@"isUploadedFavor"];
     [userDefaults synchronize];
     [self enterApp];
@@ -516,320 +525,327 @@
     int index = round(scrollView.contentOffset.x/self.view.bounds.size.width);//round函数，四舍五入
     
     self.pageControl.currentPage = index;
-    
-    if (scrollView.contentOffset.x == self.view.bounds.size.width*5) {
-        [UIView animateKeyframesWithDuration:2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-            [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+    if (scrollView.contentOffset.x == self.view.bounds.size.width*4) {
+        _isPlayed = NO;
+    }
+    if (scrollView.contentOffset.x >= self.view.bounds.size.width*4.5) {
+        if (!_isPlayed) {
+            _isPlayed = YES;
+            [UIView animateKeyframesWithDuration:1 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+                [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(0, 0));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.0714 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
                 }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                
+                [UIView addKeyframeWithRelativeStartTime:0.0714 relativeDuration:0.0714 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
                 }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.1428 relativeDuration:0.0714 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    
                 }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.2142 relativeDuration:0.0714 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    
                 }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.2856 relativeDuration:0.0714 animations:^{
+                    [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_momAndBabyImageView setNeedsLayout];
+                    [_momAndBabyImageView layoutIfNeeded];
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    
                 }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.357 relativeDuration:0.0714 animations:^{
+                    [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_foodImageView setNeedsLayout];
+                    [_foodImageView layoutIfNeeded];
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
                 }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.4284 relativeDuration:0.0714 animations:^{
+                    [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_wineImageView setNeedsLayout];
+                    [_wineImageView layoutIfNeeded];
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
                 }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(0, 0));
+                [UIView addKeyframeWithRelativeStartTime:0.4998 relativeDuration:0.0714 animations:^{
+                    [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_cosmeticImageView setNeedsLayout];
+                    [_cosmeticImageView layoutIfNeeded];
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
                 }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.0714 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
+                [UIView addKeyframeWithRelativeStartTime:0.5712 relativeDuration:0.0714 animations:^{
+                    [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_homeApplianceImageView setNeedsLayout];
+                    [_homeApplianceImageView layoutIfNeeded];
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(20, 20));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-            }];
-            
-            [UIView addKeyframeWithRelativeStartTime:0.0714 relativeDuration:0.0714 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
+                [UIView addKeyframeWithRelativeStartTime:0.6426 relativeDuration:0.0714 animations:^{
+                    [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_digitalImageView setNeedsLayout];
+                    [_digitalImageView layoutIfNeeded];
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(41, 41));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
+                [UIView addKeyframeWithRelativeStartTime:0.714 relativeDuration:0.0714 animations:^{
+                    [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_healthImageView setNeedsLayout];
+                    [_healthImageView layoutIfNeeded];
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.1428 relativeDuration:0.0714 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
+                [UIView addKeyframeWithRelativeStartTime:0.7854 relativeDuration:0.0714 animations:^{
+                    [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_homeFurnishingsImageView setNeedsLayout];
+                    [_homeFurnishingsImageView layoutIfNeeded];
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(70, 70));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
+                [UIView addKeyframeWithRelativeStartTime:0.8568 relativeDuration:0.0714 animations:^{
+                    [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.size.mas_equalTo(CGSizeMake(62, 62));
+                    }];
+                    [_everydayUseImageView setNeedsLayout];
+                    [_everydayUseImageView layoutIfNeeded];
                 }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
+                [UIView addKeyframeWithRelativeStartTime:0.9282 relativeDuration:0.0714 animations:^{
+                    
                 }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.2142 relativeDuration:0.0714 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.2856 relativeDuration:0.0714 animations:^{
-                [_momAndBabyImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_momAndBabyImageView setNeedsLayout];
-                [_momAndBabyImageView layoutIfNeeded];
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.357 relativeDuration:0.0714 animations:^{
-                [_foodImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_foodImageView setNeedsLayout];
-                [_foodImageView layoutIfNeeded];
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.4284 relativeDuration:0.0714 animations:^{
-                [_wineImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_wineImageView setNeedsLayout];
-                [_wineImageView layoutIfNeeded];
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.4998 relativeDuration:0.0714 animations:^{
-                [_cosmeticImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_cosmeticImageView setNeedsLayout];
-                [_cosmeticImageView layoutIfNeeded];
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.5712 relativeDuration:0.0714 animations:^{
-                [_homeApplianceImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_homeApplianceImageView setNeedsLayout];
-                [_homeApplianceImageView layoutIfNeeded];
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(20, 20));
-                }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.6426 relativeDuration:0.0714 animations:^{
-                [_digitalImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_digitalImageView setNeedsLayout];
-                [_digitalImageView layoutIfNeeded];
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(41, 41));
-                }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.714 relativeDuration:0.0714 animations:^{
-                [_healthImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_healthImageView setNeedsLayout];
-                [_healthImageView layoutIfNeeded];
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.7854 relativeDuration:0.0714 animations:^{
-                [_homeFurnishingsImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_homeFurnishingsImageView setNeedsLayout];
-                [_homeFurnishingsImageView layoutIfNeeded];
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(70, 70));
-                }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.8568 relativeDuration:0.0714 animations:^{
-                [_everydayUseImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.size.mas_equalTo(CGSizeMake(62, 62));
-                }];
-                [_everydayUseImageView setNeedsLayout];
-                [_everydayUseImageView layoutIfNeeded];
-            }];
-            [UIView addKeyframeWithRelativeStartTime:0.9282 relativeDuration:0.0714 animations:^{
+                
+                
+            } completion:^(BOOL finished) {
                 
             }];
 
-
-        } completion:^(BOOL finished) {
             
-        }];
-
+        }
+        
     }
     
 }

@@ -544,9 +544,11 @@
     NSString *userName = [userDefaults objectForKey:@"username"];
     NSString *userId = [userDefaults objectForKey:@"userid"];
     NSString *token = [userDefaults objectForKey:@"CA-Token"];
+    NSString *petName = [userDefaults objectForKey:@"petname"];
     //NSLog(@"%@",userName);
     //NSLog(@"%@",userId);
     //NSLog(@"%@",token);
+    //NSLog(@"petName:%@",petName);
     
 
     
@@ -565,6 +567,9 @@
     [addDic setValue:productname forKey:@"productname"];
     [addDic setValue:userName forKey:@"username"];
     [addDic setValue:userId forKey:@"userid"];
+    if (![petName isEqualToString:@""]) {
+        [addDic setValue:petName forKey:@"uname"];
+    }
     [addDic setValue:[NSNumber numberWithInteger:self.clickStar] forKey:@"levelscore"];
     if ([self.textView.text isEqualToString:@""]) {
         MBProgressHUD *Hud = [[MBProgressHUD alloc] initWithView:self.view];
@@ -999,7 +1004,7 @@
             NSString *page = [NSString stringWithFormat:@"%ld",(long)self.pageCount];
             [CommentNetManager getCcodeCommentWithTypeID:typeid CurrentPage:page PageSize:@"10" completionHandle:^(id responseObject, NSError *error) {
                 if (!error) {
-                    //NSLog(@"%@",responseObject);
+                    NSLog(@"%@",responseObject);
                     NSMutableArray *other = [responseObject[@"Data"] mutableCopy];
                     [self.commentArray addObjectsFromArray:other];
                     [self.tableView reloadData];
@@ -1038,7 +1043,7 @@
         NSString *typeid = [self.productDic objectForKey:@"typeid"];
         [CommentNetManager getCcodeCommentWithTypeID:typeid CurrentPage:@"0" PageSize:@"10" completionHandle:^(id responseObject, NSError *error) {
             if (!error) {
-                //NSLog(@"%@",responseObject);
+                NSLog(@"%@",responseObject);
                 self.commentArray = [responseObject[@"Data"] mutableCopy];
                 self.totalScore = [NSNumber numberWithFloat:([responseObject[@"totalscore1"] floatValue]/[responseObject[@"totalcnt"] floatValue])];
                 CAShapeLayer *maskLayer = [CAShapeLayer layer];

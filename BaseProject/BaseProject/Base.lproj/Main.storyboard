@@ -339,6 +339,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="contentLabel" destination="l6a-tu-dYd" id="GSM-je-R3Y"/>
                         <outlet property="versionLabel" destination="YLy-pb-sWQ" id="y3a-F8-eyP"/>
                     </connections>
                 </viewController>

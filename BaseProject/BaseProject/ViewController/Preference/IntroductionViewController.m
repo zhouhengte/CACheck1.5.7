@@ -10,6 +10,7 @@
 
 @interface IntroductionViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
+@property (weak, nonatomic) IBOutlet UILabel *contentLabel;
 
 @end
 
@@ -21,7 +22,7 @@
     self.versionLabel.text = [NSString stringWithFormat:@"V %@",[infoDictionary objectForKey:@"CFBundleShortVersionString"]];
     
     [self setNavigationBar];
-    
+    NSLog(@"contentLabel:%@",_contentLabel.font);
 }
 
 - (void)viewWillAppear:(BOOL)animated
